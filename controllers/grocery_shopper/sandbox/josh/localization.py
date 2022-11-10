@@ -4,7 +4,7 @@ import math
     Localization - Tier 1
 """
 class Localization:
-    
+
     def __init__(self, gps, compass, pose_x=0, pose_y=0, pose_theta=0):
         self.gps     = gps
         self.compass = compass
