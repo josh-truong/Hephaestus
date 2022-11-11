@@ -5,9 +5,9 @@ sceneTreePerspectives: 000000ff000000010000000300000020000000c0000000fc010000000
 maximizedDockId: -1
 centralWidgetVisible: 1
 projectionMode: PERSPECTIVE
-orthographicViewHeight: 8.17991
+orthographicViewHeight: 23.0893
 textFiles: -1
 globalOptionalRendering: LidarPointClouds::CoordinateSystem
 consoles: Console:All:All
 renderingDevicePerspectives: TIAGo Steel:camera;0;1;0;0
-renderingDevicePerspectives: TIAGo Steel:display;1;0.872222;0;0
+renderingDevicePerspectives: TIAGo Steel:display;1;1.37778;0;0
