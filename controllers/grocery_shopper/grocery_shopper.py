@@ -3,8 +3,13 @@
 # Nov 2, 2022
 
 from controller import Robot
+from controller import Keyboard
+
 import math
 import numpy as np
+
+from localization import Localization
+from mapping import Mapping
 
 #Initialization
 print("=== Initializing Grocery Shopper...")
@@ -86,17 +91,32 @@ map = None
 
 # ------------------------------------------------------------------
 # Helper Functions
+print("=== Initializing Class Components...")
+localization = Localization(MAX_SPEED, MAX_SPEED_MS, AXLE_LENGTH)
+
+mapping = Mapping(MAX_SPEED, LIDAR_SENSOR_MAX_RANGE, LIDAR_ANGLE_BINS, LIDAR_ANGLE_RANGE, lidar_offsets)
+
+# We are using a keyboard to remote control the robot
+keyboard = robot.getKeyboard()
+keyboard.enable(timestep)
 
 
 gripper_status="closed"
 
 # Main Loop
 while robot.step(timestep) != -1:
-    
-    
+    pose_x, pose_y, pose_theta = localization.get_pose(gps, compass)
+    vL, vR = mapping.manual_control(keyboard)
+
+    point_cloud = mapping.get_lidar_point_cloud(lidar, pose_x, pose_y, pose_theta)
+    mapping.display_point_cloud(display, point_cloud)
+
+    localization.update_pose(vL, vR, timestep, print_pose=False)
+
     robot_parts["wheel_left_joint"].setVelocity(vL)
     robot_parts["wheel_right_joint"].setVelocity(vR)
-    
+
+
     if(gripper_status=="open"):
         # Close gripper, note that this takes multiple time steps...
         robot_parts["gripper_left_finger_joint"].setPosition(0)
