@@ -1,5 +1,7 @@
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+
 
 class Mapping:
     def __init__(self, MAX_SPEED, LIDAR_SENSOR_MAX_RANGE, LIDAR_ANGLE_BINS, LIDAR_ANGLE_RANGE, lidar_offsets):
@@ -12,7 +14,7 @@ class Mapping:
         self.map = np.zeros((360, 360))
         self.robot_poses = [] # List to hold robot previous poses
 
-    def manual_control(self, keyboard, tol=0.5):
+    def manual_control(self, keyboard, display, tol=0.5):
         MAX_SPEED = self.MAX_SPEED
         key = keyboard.getKey()
         
@@ -29,11 +31,38 @@ class Mapping:
         elif key == ord(' '):
             vL, vR = 0, 0
         elif key == ord('S'):
-            # Part 1.4: Filter map and save to filesystem
-            map = (self.map > tol).astype(int)
-            np.save("map.npy",map)
-            print("Map file saved")
+            self.save_mapping()
+        elif key == ord('L'):
+            self.map = self.load_mapping()
+            self.display_point_cloud(display, None, redraw=True)
+        elif key == ord('D'):
+            self.display_mapping()
+        elif key == ord('F'):
+            map = self.filter_map(tol=0.5)
+            self.display_mapping(map)
         return vL, vR
+
+    def save_mapping(self):
+        np.save("map.npy", self.map)
+        print("Map file saved.")
+
+    def load_mapping(self):
+        map = np.load("map.npy", allow_pickle=True)
+        print("Map file loaded.")
+        return map
+    
+    def display_mapping(self, map=None):
+        map = self.map if (map is None) else map
+        plt.imshow(map)
+        plt.colorbar()
+        plt.show()
+    
+    def filter_map(self, map=None, tol=0.5):
+        map = self.map if (map is None) else map
+        map = (map >= tol).astype(int)
+        np.save("filtered_map.npy", map)
+        print("Filtered map file saved.")
+        return map
 
     def get_display_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = (display[0]*0.5) - (x * (display[0]/world[0]))
@@ -74,7 +103,21 @@ class Mapping:
         return point_cloud
 
 
-    def display_point_cloud(self, display, point_cloud):
+    def display_point_cloud(self, display, point_cloud, redraw=False):
+        if (redraw):
+            for i in range(self.map.shape[0]*self.map.shape[1]):
+                y, x = i // self.map.shape[1], i % self.map.shape[1]
+
+                display.setColor(0x000000)
+                display.drawPixel(x, y)
+
+                grayscale = int(self.map[y][x]*255)
+                color = int(grayscale*256**2 + grayscale*256 + grayscale)
+                display.setColor(color)
+                display.drawPixel(x, y)
+
+        if (point_cloud is None): return
+
         for x, y in point_cloud:
             x, y = self.get_display_coords(x, y)
             pixel = np.clip(self.map[y][x] + 5e-3, 0.0, 1.0)

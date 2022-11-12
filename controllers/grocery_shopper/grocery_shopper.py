@@ -106,7 +106,7 @@ gripper_status="closed"
 # Main Loop
 while robot.step(timestep) != -1:
     pose_x, pose_y, pose_theta = localization.get_pose(gps, compass)
-    vL, vR = mapping.manual_control(keyboard)
+    vL, vR = mapping.manual_control(keyboard, display)
 
     point_cloud = mapping.get_lidar_point_cloud(lidar, pose_x, pose_y, pose_theta)
     mapping.display_point_cloud(display, point_cloud)
