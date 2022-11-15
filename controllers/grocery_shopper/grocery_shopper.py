@@ -111,7 +111,7 @@ while robot.step(timestep) != -1:
     point_cloud = mapping.get_lidar_point_cloud(lidar, pose_x, pose_y, pose_theta)
     mapping.display_point_cloud(display, point_cloud)
 
-    localization.update_pose(vL, vR, timestep, print_pose=False)
+    localization.update_odometry(vL, vR, timestep, print_pose=False)
 
     robot_parts["wheel_left_joint"].setVelocity(vL)
     robot_parts["wheel_right_joint"].setVelocity(vR)
