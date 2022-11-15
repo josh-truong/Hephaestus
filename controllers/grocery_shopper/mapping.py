@@ -76,6 +76,19 @@ class Mapping:
         return lidar_sensor_readings
     
     def homogenous_transform(self, rho, pose_x, pose_y, pose_theta):
+        """
+        homogenous_transform method converts from robot into world coordinates.
+        This method uses matrix operations, instead of the expanded form in a loop.
+
+        # Expanded equivalence for one point
+        rx = -math.cos(alpha)*rho + 0.202
+        ry =  math.sin(alpha)*rho - 0.004
+
+        # Convert detection from robot coordinates into world coordinates
+        wx =  math.cos(pose_theta)*rx - math.sin(pose_theta)*ry + pose_x
+        wy =  +(math.sin(pose_theta)*rx + math.cos(pose_theta)*ry) + pose_y
+        """
+
         # point_local_frame: 4 x m matrix
         point_local_frame = np.array([
             -np.cos(self.lidar_offsets) * rho + 0.202,
@@ -92,15 +105,14 @@ class Mapping:
         ])
         # point_world_frame: m x 4 matrix
         point_world_frame = (T @ point_local_frame).T
-
-        return point_world_frame[:, :2]
+        return point_world_frame
 
     def get_lidar_point_cloud(self, lidar, pose_x, pose_y, pose_theta):
         self.robot_poses.append(self.get_display_coords(pose_x, pose_y))
 
         lidar_sensor_readings = self.get_lidar_readings(lidar)
         point_cloud = self.homogenous_transform(lidar_sensor_readings, pose_x, pose_y, pose_theta)
-        return point_cloud
+        return point_cloud[:, :2]
 
 
     def display_point_cloud(self, display, point_cloud, redraw=False):
@@ -117,7 +129,6 @@ class Mapping:
                 display.drawPixel(x, y)
 
         if (point_cloud is None): return
-
         for x, y in point_cloud:
             x, y = self.get_display_coords(x, y)
             pixel = np.clip(self.map[y][x] + 5e-3, 0.0, 1.0)
