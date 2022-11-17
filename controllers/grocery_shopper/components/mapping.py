@@ -39,7 +39,7 @@ class Mapping:
         elif key == ord('F'):
             map = self.Map.filter(tol=0.5)
             self.Map.display(map)
-        return vL, vR
+        return vL*0.3, vR*0.3
 
     def get_display_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = (display[0]*0.5) - (x * (display[0]/world[0]))
