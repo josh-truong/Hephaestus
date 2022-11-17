@@ -1,12 +1,7 @@
 """grocery controller."""
 
-# Nov 2, 2022
-
 from controller import Robot
 from controller import Keyboard
-
-import math
-import numpy as np
 
 from components import RobotConst, LidarConst
 from components import Localization, Mapping
@@ -58,9 +53,6 @@ lidar.enablePointCloud()
 display = robot.getDevice("display")
 
 
-vL = 0
-vR = 0
-
 
 # ------------------------------------------------------------------
 # Helper Functions
@@ -78,8 +70,9 @@ gripper_status="closed"
 # Main Loop
 while robot.step(timestep) != -1:
     # pose = localization.get_pose(gps, compass)
-    pose = localization.pose
+    
     vL, vR = mapping.manual_control(keyboard, display)
+    pose = localization.pose
 
     point_cloud = mapping.get_lidar_point_cloud(lidar, pose)
     mapping.display_point_cloud(display, point_cloud)
