@@ -53,14 +53,9 @@ class Localization:
         delta_velocity = (rot_mat @ velocity)
         pose_x, pose_y, pose_theta = delta_velocity*(ts/1000.0)
         """
-        ts = ts/1000.0
-        MAX_SPEED_RAD_M_S = self.MAX_SPEED*self.MAX_SPEED_MS
-        x_r     = (vL+vR)/2/MAX_SPEED_RAD_M_S
-        omega_r = (vR-vL)/self.AXLE_LENGTH/MAX_SPEED_RAD_M_S
-
-        self.pose.x     += (x_r*math.cos(self.pose.theta))*ts
-        self.pose.y     -= (x_r*math.sin(self.pose.theta))*ts
-        self.pose.theta += omega_r*ts
+        self.pose.x -= (vL+vR)/2/self.MAX_SPEED*self.MAX_SPEED_MS*ts/1000.0*math.cos(self.pose.theta)
+        self.pose.y -= (vL+vR)/2/self.MAX_SPEED*self.MAX_SPEED_MS*ts/1000.0*math.sin(self.pose.theta)
+        self.pose.theta += (vR-vL)/self.AXLE_LENGTH/self.MAX_SPEED*self.MAX_SPEED_MS*ts/1000.0
 
         if (print_pose):
             print(f"X: {self.pose.x:.2f} Z: {self.pose.y:.2f} Theta: {self.pose.theta:2f}")
