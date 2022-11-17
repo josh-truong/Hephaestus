@@ -4,7 +4,7 @@ from controller import Robot
 from controller import Keyboard
 
 from components import RobotConst, LidarConst
-from components import Localization, Mapping
+from components import Localization, Mapping, EKF
 
 #Initialization
 print("=== Initializing Grocery Shopper...")
@@ -58,7 +58,9 @@ display = robot.getDevice("display")
 # Helper Functions
 print("=== Initializing Class Components...")
 localization = Localization(RobotConst())
-mapping = Mapping(RobotConst(), LidarConst())
+mapping      = Mapping(RobotConst(), LidarConst())
+slam         = EKF()
+
 
 # We are using a keyboard to remote control the robot
 keyboard = robot.getKeyboard()
@@ -70,6 +72,7 @@ gripper_status="closed"
 # Main Loop
 while robot.step(timestep) != -1:
     # pose = localization.get_pose(gps, compass)
+    slam.update()
     
     vL, vR = mapping.manual_control(keyboard, display)
     pose = localization.pose
