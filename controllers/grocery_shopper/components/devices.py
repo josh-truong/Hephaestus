@@ -1,20 +1,30 @@
+"""
+devices.py
+
+Created on Fri Nov 19 2022
+@Lead: Joshua Truong
+"""
+
 from controller import Robot
 from .constants import RobotConst
 from .mapping import Mapping as MappingClass
 
-
 class Device:
-    def __init__(self):
+    def __init__(self, m):
         print("=== Device Component Initialized...")
-        self.robot_parts = {}
+        self.m = m
 
+        self.robot_parts = {}
         self.robot = Robot()
         self.timestep = int(self.robot.getBasicTimeStep())
 
+        # Enable devices
+        self.robot_parts = self.set_robot_parts()
+        self.left_gripper_enc, self.right_gripper_enc = self.enable_gripper_encoders()
+        self.gps, self.compass = self.enable_gps_compass()
+        self.lidar = self.enable_lidar()
+        self.display = self.enable_display()
         self.keyboard = self.enable_keyboard()
-        self.display  = self.enable_display()
-
-        self.rConst = RobotConst()
 
     def robot_step(self):
         return self.robot.step(self.timestep)
@@ -31,7 +41,7 @@ class Device:
             target_pos = (0.0, 0.0, 0.35, 0.07, 1.02, -3.16, 1.27, 1.32, 0.0, 1.41, 'inf', 'inf',0.045,0.045)
         
         robot_parts={}
-        for i, part_name in enumerate(RobotConst().PART_NAMES):
+        for i, part_name in enumerate(self.m.rConst.PART_NAMES):
             robot_parts[part_name] = self.robot.getDevice(part_name)
             robot_parts[part_name].setPosition(float(target_pos[i]))
             robot_parts[part_name].setVelocity(robot_parts[part_name].getMaxVelocity() / 2.0)
@@ -41,34 +51,6 @@ class Device:
     def set_wheel_joint_vel(self, vL, vR):
         self.robot_parts["wheel_left_joint"].setVelocity(vL)
         self.robot_parts["wheel_right_joint"].setVelocity(vR)
-
-    def manual_control(self, Mapping: MappingClass, vel_ratio=1, filter_tol=0.5):
-        MAX_SPEED = self.rConst.MAX_SPEED
-        key = self.keyboard.getKey()
-        
-        vL, vR = 0, 0
-        while(self.keyboard.getKey() != -1): pass
-        if key == self.keyboard.LEFT :
-            vL, vR = -MAX_SPEED, MAX_SPEED
-        elif key == self.keyboard.RIGHT:
-            vL, vR = MAX_SPEED, -MAX_SPEED
-        elif key == self.keyboard.UP:
-            vL, vR = MAX_SPEED, MAX_SPEED
-        elif key == self.keyboard.DOWN:
-            vL, vR = -MAX_SPEED, -MAX_SPEED
-        elif key == ord(' '):
-            vL, vR = 0, 0
-        elif key == ord('S'):
-            Mapping.Map.save()
-        elif key == ord('L'):
-            map = Mapping.Map.load()
-            Mapping.display_point_cloud(self.display, None, redraw=True)
-        elif key == ord('D'):
-            Mapping.Map.display()
-        elif key == ord('F'):
-            map = Mapping.Map.filter(tol=filter_tol)
-            Mapping.Map.display(map)
-        return vL*vel_ratio, vR*vel_ratio
 
     def enable_gripper_encoders(self):
         # Enable gripper encoders (position sensors)
