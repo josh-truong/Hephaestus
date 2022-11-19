@@ -5,24 +5,24 @@ import numpy as np
 
 from controller import Keyboard
 
-from components import LidarConst
-from components import Device, Localization, Mapping, EKF
+from components import Pose, Map
+from components import Manager, Localization, Mapping, SLAM, Device, RobotController
+
+
 
 #Initialization
 print("=== Initializing Grocery Shopper...")
 
-devices      = Device()
-localization = Localization()
-mapping      = Mapping()
-slam         = EKF()
+m = Manager()
+m.Localization    = Localization(m)
+m.Mapping         = Mapping(m)
+m.Slam            = SLAM(m)
+m.Device          = Device(m)
+m.RobotController = RobotController(m)
 
-# Enable devices
-robot_parts = devices.set_robot_parts()
-left_gripper_enc, right_gripper_enc = devices.enable_gripper_encoders()
-gps, compass = devices.enable_gps_compass()
-lidar = devices.enable_lidar()
-display = devices.enable_display()
-keyboard = devices.enable_keyboard()
+
+
+
 
 
 
@@ -61,14 +61,28 @@ show_animation = True
 ####################################
 ####################################
 
-
+goal = Pose(-13, -5)
 
 # Main Loop
-while devices.robot_step() != -1:
-    pose = localization.get_pose(gps, compass)
+while m.Device.robot_step() != -1:
+    vL, vR = m.RobotController.controller(control_type='manual', vel_ratio=1)
+    pose = m.Localization.get_pose()
+    
+    point_cloud = m.Mapping.get_lidar_point_cloud(pose)
+    m.Mapping.display_point_cloud(point_cloud)
+
+    # rho   = localization.get_position_error(goal)
+    # alpha = localization.get_bearing_error(goal)
+    # eta   = localization.get_heading_error(goal)
+
+    m.Localization.update_odometry(vL, vR, print_pose=False)
+    m.Device.set_wheel_joint_vel(vL, vR)
 
 
-    u = calc_input()
+    # slam.ekf(xEst, PEst, u, z)
+
+
+    # u = calc_input()
     # xTrue, z, xDR, ud = slam.observation(xTrue, xDR, u, RFID)
     # xEst, PEst = ekf_slam(xEst, PEst, ud, z)
     # x_state = xEst[0:STATE_SIZE]
@@ -96,27 +110,22 @@ while devices.robot_step() != -1:
 
 
 
-    vL, vR = mapping.manual_control(keyboard, display)
-    # pose = localization.pose
-
-    point_cloud = mapping.get_lidar_point_cloud(lidar, pose)
-    mapping.display_point_cloud(display, point_cloud)
-
-    localization.update_odometry(vL, vR, devices.get_timestep(), print_pose=False)
-
-    robot_parts["wheel_left_joint"].setVelocity(vL)
-    robot_parts["wheel_right_joint"].setVelocity(vR)
+    
 
 
-    if(gripper_status=="open"):
-        # Close gripper, note that this takes multiple time steps...
-        robot_parts["gripper_left_finger_joint"].setPosition(0)
-        robot_parts["gripper_right_finger_joint"].setPosition(0)
-        if right_gripper_enc.getValue()<=0.005:
-            gripper_status="closed"
-    else:
-        # Open gripper
-        robot_parts["gripper_left_finger_joint"].setPosition(0.045)
-        robot_parts["gripper_right_finger_joint"].setPosition(0.045)
-        if left_gripper_enc.getValue()>=0.044:
-            gripper_status="open"
+
+
+
+    ## Temporary commented code
+    # if(gripper_status=="open"):
+    #     # Close gripper, note that this takes multiple time steps...
+    #     robot_parts["gripper_left_finger_joint"].setPosition(0)
+    #     robot_parts["gripper_right_finger_joint"].setPosition(0)
+    #     if right_gripper_enc.getValue()<=0.005:
+    #         gripper_status="closed"
+    # else:
+    #     # Open gripper
+    #     robot_parts["gripper_left_finger_joint"].setPosition(0.045)
+    #     robot_parts["gripper_right_finger_joint"].setPosition(0.045)
+    #     if left_gripper_enc.getValue()>=0.044:
+    #         gripper_status="open"
