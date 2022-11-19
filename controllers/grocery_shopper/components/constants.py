@@ -1,3 +1,10 @@
+"""
+constants.py
+
+Created on Fri Nov 19 2022
+@Lead: Joshua Truong
+"""
+
 import math
 import numpy as np
 
