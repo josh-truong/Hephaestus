@@ -6,7 +6,7 @@ from components import RobotConst, LidarConst
 
 class Mapping:
     def __init__(self):
-        print("=== Initializing Mapping Component...")
+        print("=== Mapping Component Initialized...")
         rConst, lConst = RobotConst(), LidarConst()
         self.MAX_SPEED              = rConst.MAX_SPEED
         self.LIDAR_SENSOR_MAX_RANGE = lConst.SENSOR_MAX_RANGE
@@ -16,34 +16,6 @@ class Mapping:
 
         self.Map = Map()
         self.robot_poses = [] # List to hold robot previous poses
-
-    def manual_control(self, keyboard, display, tol=0.5):
-        MAX_SPEED = self.MAX_SPEED
-        key = keyboard.getKey()
-        
-        vL, vR = 0, 0
-        while(keyboard.getKey() != -1): pass
-        if key == keyboard.LEFT :
-            vL, vR = -MAX_SPEED, MAX_SPEED
-        elif key == keyboard.RIGHT:
-            vL, vR = MAX_SPEED, -MAX_SPEED
-        elif key == keyboard.UP:
-            vL, vR = MAX_SPEED, MAX_SPEED
-        elif key == keyboard.DOWN:
-            vL, vR = -MAX_SPEED, -MAX_SPEED
-        elif key == ord(' '):
-            vL, vR = 0, 0
-        elif key == ord('S'):
-            self.Map.save()
-        elif key == ord('L'):
-            map = self.Map.load()
-            self.display_point_cloud(display, None, redraw=True)
-        elif key == ord('D'):
-            self.Map.display()
-        elif key == ord('F'):
-            map = self.Map.filter(tol=0.5)
-            self.Map.display(map)
-        return vL*0.3, vR*0.3
 
     def get_display_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = (display[0]*0.5) - (x * (display[0]/world[0]))
