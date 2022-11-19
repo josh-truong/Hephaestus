@@ -1,14 +1,18 @@
 import numpy as np
 import math
 from .utils import Map
+from components import RobotConst, LidarConst
+
 
 class Mapping:
-    def __init__(self, RobotConst, LidarConst):
-        self.MAX_SPEED              = RobotConst.MAX_SPEED
-        self.LIDAR_SENSOR_MAX_RANGE = LidarConst.SENSOR_MAX_RANGE
-        self.LIDAR_ANGLE_BINS       = LidarConst.ANGLE_BINS
-        self.LIDAR_ANGLE_RANGE      = LidarConst.ANGLE_RANGE
-        self.lidar_offsets          = LidarConst.OFFSETS
+    def __init__(self):
+        print("=== Initializing Mapping Component...")
+        rConst, lConst = RobotConst(), LidarConst()
+        self.MAX_SPEED              = rConst.MAX_SPEED
+        self.LIDAR_SENSOR_MAX_RANGE = lConst.SENSOR_MAX_RANGE
+        self.LIDAR_ANGLE_BINS       = lConst.ANGLE_BINS
+        self.LIDAR_ANGLE_RANGE      = lConst.ANGLE_RANGE
+        self.lidar_offsets          = lConst.OFFSETS
 
         self.Map = Map()
         self.robot_poses = [] # List to hold robot previous poses
