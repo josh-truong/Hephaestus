@@ -1,13 +1,17 @@
 import math
 import numpy as np
 from .utils import Pose
+from .constants import RobotConst
+
 
 class Localization:
 
-    def __init__(self, RobotConst):
-        self.MAX_SPEED    = RobotConst.MAX_SPEED
-        self.MAX_SPEED_MS = RobotConst.MAX_SPEED_MS
-        self.AXLE_LENGTH  = RobotConst.AXLE_LENGTH
+    def __init__(self):
+        print("=== Initializing Localization Component...")
+        rConst = RobotConst()
+        self.MAX_SPEED    = rConst.MAX_SPEED
+        self.MAX_SPEED_MS = rConst.MAX_SPEED_MS
+        self.AXLE_LENGTH  = rConst.AXLE_LENGTH
 
         self.pose = Pose(0, 0, 0)
 
