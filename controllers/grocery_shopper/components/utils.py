@@ -1,8 +1,15 @@
+"""
+utils.py
+
+Created on Fri Nov 19 2022
+@Lead: Joshua Truong
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 class Pose:
-    def __init__(self, x, y, theta):
+    def __init__(self, x=0, y=0, theta=0):
         self.x     = x
         self.y     = y
         self.theta = theta
