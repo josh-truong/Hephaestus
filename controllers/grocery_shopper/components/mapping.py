@@ -1,19 +1,12 @@
 import numpy as np
 import math
 from .utils import Map
-from components import RobotConst, LidarConst
 
 
 class Mapping:
-    def __init__(self):
+    def __init__(self, m):
         print("=== Mapping Component Initialized...")
-        rConst, lConst = RobotConst(), LidarConst()
-        self.MAX_SPEED              = rConst.MAX_SPEED
-        self.LIDAR_SENSOR_MAX_RANGE = lConst.SENSOR_MAX_RANGE
-        self.LIDAR_ANGLE_BINS       = lConst.ANGLE_BINS
-        self.LIDAR_ANGLE_RANGE      = lConst.ANGLE_RANGE
-        self.lidar_offsets          = lConst.OFFSETS
-
+        self.m = m
         self.Map = Map()
         self.robot_poses = [] # List to hold robot previous poses
 
@@ -23,7 +16,8 @@ class Mapping:
         x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
         return int(x), int(y)
 
-    def get_lidar_readings(self, lidar):
+    def get_lidar_readings(self):
+        lidar = self.m.Device.lidar
         lidar_sensor_readings = lidar.getRangeImage()
         lidar_sensor_readings = lidar_sensor_readings[83:len(lidar_sensor_readings)-83]
         return lidar_sensor_readings
@@ -41,34 +35,43 @@ class Mapping:
         wx =  math.cos(pose_theta)*rx - math.sin(pose_theta)*ry + pose_x
         wy =  +(math.sin(pose_theta)*rx + math.cos(pose_theta)*ry) + pose_y
         """
+        lConst = self.m.lConst
+        lidar_offsets = lConst.OFFSETS
+        LIDAR_SENSOR_MAX_RANGE = lConst.SENSOR_MAX_RANGE
 
-        # point_local_frame: 4 x m matrix
+        # point_local_frame: 3 x m matrix
         point_local_frame = np.array([
-            -np.cos(self.lidar_offsets) * rho + 0.202,
-             np.sin(self.lidar_offsets) * rho - 0.004,
+            -np.cos(lidar_offsets) * rho + 0.202,
+             np.sin(lidar_offsets) * rho - 0.004,
             np.ones(len(rho))
         ])
+        # Drop any columns that exceed LIDAR_SENSOR_MAX_RANGE
+        within_range = np.where(np.array(rho) <= LIDAR_SENSOR_MAX_RANGE)[0]
+        point_local_frame = point_local_frame[:, within_range]
+
         # Drop any columns that contains inf
         point_local_frame = point_local_frame[:, ~np.isinf(point_local_frame).any(axis=0)]
-        # T: 4 x 4 matrix
+        
+        # T: 3 x 3 matrix
         T = np.array([
             [ np.cos(pose.theta), -np.sin(pose.theta), pose.x],
             [ np.sin(pose.theta),  np.cos(pose.theta), pose.y],
             [0, 0, 1]
         ])
-        # point_world_frame: m x 4 matrix
+        # point_world_frame: m x 3 matrix
         point_world_frame = (T @ point_local_frame).T
         return point_world_frame
 
-    def get_lidar_point_cloud(self, lidar, pose):
+    def get_lidar_point_cloud(self, pose):
         self.robot_poses.append(self.get_display_coords(pose.x, pose.y))
 
-        lidar_sensor_readings = self.get_lidar_readings(lidar)
+        lidar_sensor_readings = self.get_lidar_readings()
         point_cloud = self.homogenous_transform(lidar_sensor_readings, pose)
         return point_cloud[:, :2]
 
 
-    def display_point_cloud(self, display, point_cloud, redraw=False):
+    def display_point_cloud(self, point_cloud, redraw=False):
+        display = self.m.Device.display
         if (redraw):
             for i in range(self.Map.shape[0]*self.Map.shape[1]):
                 y, x = i // self.Map.shape[1], i % self.Map.shape[1]
