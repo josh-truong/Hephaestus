@@ -16,7 +16,6 @@ class Localization:
         self.m = m
         self.Pose = Pose(0, 0, 0)
 
-
     def get_pose(self):
         """
         Tier 1 - Localization
@@ -26,7 +25,7 @@ class Localization:
         compass = self.m.Device.compass
 
         n = compass.getValues()
-        rad = ((math.atan2(n[0], n[1])))
+        rad = math.atan2(n[0], n[1])
 
         pose_x = -gps.getValues()[0]
         pose_y = -gps.getValues()[1]
@@ -46,8 +45,8 @@ class Localization:
         """
         Calculates the angle alpha between the robot orientation and the direction of the goal.
         """
-        alpha = math.atan2(goal.y - self.Pose.y, goal.x - self.Pose.x)
-        alpha += (math.pi if (alpha < 0) else -math.pi) - self.Pose.theta
+        alpha = math.atan2(goal.y - self.Pose.y, goal.x - self.Pose.x) - self.Pose.theta
+        alpha += (math.pi if (alpha < 0) else -math.pi)
         return alpha
 
     def get_heading_error(self, goal: Pose):
