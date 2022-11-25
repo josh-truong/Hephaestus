@@ -8,7 +8,7 @@ Created on Fri Nov 19 2022
 from controller import Robot
 from .constants import RobotConst
 from .mapping import Mapping as MappingClass
-
+import numpy as np
 class Device:
     def __init__(self, m):
         print("=== Device Component Initialized...")
@@ -24,6 +24,7 @@ class Device:
         self.gps, self.compass = self.enable_gps_compass()
         self.lidar = self.enable_lidar()
         self.display = self.enable_display()
+        self.camera = self.enable_camera()
         self.keyboard = self.enable_keyboard()
 
     def robot_step(self):
@@ -66,6 +67,10 @@ class Device:
         camera.enable(self.timestep)
         camera.recognitionEnable(self.timestep)
         return camera
+
+    def get_camera_image(self):
+        """Returns (240, 135, 3) image array"""
+        return self.camera.getImageArray()
 
     def enable_gps_compass(self):
         # Enable GPS and compass localization
