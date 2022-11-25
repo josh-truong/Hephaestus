@@ -9,11 +9,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Pose:
-    def __init__(self, x=0, y=0, theta=0):
-        self.x     = x
-        self.y     = y
-        self.theta = theta
+    def __init__(self, *args):
+        args = list(args)
+        args = args[0] if (len(args) == 1) else args
 
+        self.x     = args[0]
+        self.y     = args[1]
+        self.theta = args[2]
 
 class Map:
     def __init__(self, size=(360, 360)):
