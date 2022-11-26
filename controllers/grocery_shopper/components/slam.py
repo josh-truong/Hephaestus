@@ -13,10 +13,6 @@ import numpy as np
 
 
 class SLAM:
-    """
-    https://atsushisakai.github.io/PythonRobotics/modules/slam
-    """
-
     def __init__(self):
         raise NotImplementedError()
     
