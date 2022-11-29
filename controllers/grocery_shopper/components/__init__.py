@@ -7,3 +7,5 @@ from .localization import Localization
 from .mapping import Mapping
 from .slam import SLAM
 from .robotController import RobotController
+from .manipulation import Manipulation
+from .planning import Planning

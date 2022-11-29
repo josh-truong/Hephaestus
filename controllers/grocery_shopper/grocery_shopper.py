@@ -4,9 +4,10 @@ import numpy as np
 import math
 
 from controller import Keyboard
+from controller import Supervisor
 
 from components import Pose, Map
-from components import Manager, Localization, Mapping, SLAM, Device, RobotController
+from components import Manager, Localization, Mapping, SLAM, Device, RobotController, Manipulation
 
 
 
@@ -27,6 +28,12 @@ m.Slam            = SLAM
 m.Device          = Device
 m.RobotController = RobotController
 
+# # Initialize the Webots Supervisor.
+# supervisor = Supervisor()
+# timeStep = Device.robot_step()
+
+# Maniplation = Manipulation(4, supervisor, timeStep)
+
 m.RobotController.set_waypoints([
     (  4.80,  0.00,  0.00),
     (  4.79, -2.13,  0.00),
@@ -40,9 +47,6 @@ m.RobotController.set_waypoints([
     (-12.44, -5.44, -3.14),
     (  5.31, -5.69, -1.56),
     ])
-
-
-
 
 
 gripper_status="closed"
@@ -82,7 +86,7 @@ show_animation = True
 
 
 # Main Loop
-while Device.robot_step() != -1:
+while supervisor.step(timeStep) != -1:
     vL, vR = RobotController.controller(
         control_type='auto', 
         vel_ratio=0.5,
