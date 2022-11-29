@@ -85,7 +85,7 @@ class RobotController:
         phi_r = x_dot + ((theta_dot * AXLE_LENGTH) / 2) # Right wheel velocity in rad/s
         
         # Normalize wheelspeed
-        turn_ratio  = 0.3 if (np.sign(phi_l) != np.sign(phi_r)) else 1
+        turn_ratio  = 0.20 if (np.sign(phi_l) != np.sign(phi_r)) else 1
         phi_l_ratio = 1 if (abs(phi_l) > abs(phi_r)) else abs(phi_l/phi_r)
         phi_r_ratio = 1 if (abs(phi_r) > abs(phi_l)) else abs(phi_r/phi_l)
         phi_l = np.sign(phi_l)*MAX_SPEED*vRatio*phi_l_ratio*turn_ratio
