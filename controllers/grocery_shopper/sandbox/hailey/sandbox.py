@@ -2,6 +2,8 @@
 from controller import Robot
 import math
 import numpy as np
+from matplotlib import pyplot as plt
+
 #from controller import 
 from controller import Camera
 
@@ -202,22 +204,19 @@ def detect():
   # Get the centroids of the img_mask blobs
     object_positions_list = get_blob_centroids(blobs)
     print("len::  ", len(object_positions_list))
-  ########## PART 4 (Done for you) ############
-  # Display images and blob annotations
-   # img_markup = img.copy()
-   # for obj_pos in object_positions_list:
-    #    obj_pos_vector = np.array(obj_pos).astype(np.int32) # In case your object positions weren't numpy arrays
-     #   img_markup = cv2.circle(img_markup,(obj_pos_vector[1], obj_pos_vector[0]),5,(0,0,0),10)
-        #print("Object pos: " + str(obj_pos_vector))
-    return (img,img_mask)
-  # Display the original image, the mask, and the original image with object centers drawn on it
-  # Objective: Show that your algorithm works by displaying the results!
-  #
-  # Approach:
-  # Use the OpenCV imshow() function to display the results of your object detector
-  # Create a window for each image
-#    cv2.imshow('orig', img)
- #   cv2.imshow('mask', img_mask)
-  #  cv2.imshow('located', img_markup)
-   # cv2.waitKey(-1)  # Wait until a key is pressed to exit the program
-    #cv2.destroyAllWindows() # Close all the windows
+    isObj = True if len(object_positions_list) > 0 else False
+    
+    return (isObj, img, img_mask)
+ 
+def show_image():
+    isObj, img, mask = detect()
+    plt.imshow(img)
+    plt.title('View')
+    plt.show()
+    
+    plt.imshow(mask)
+    plt.title('Mask')
+    plt.show()
+    
+    if isObj:
+        print(objectfound)
