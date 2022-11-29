@@ -1,111 +1,151 @@
 """grocery controller."""
-
-# Nov 2, 2022
-
-from controller import Robot
-import math
+import matplotlib.pyplot as plt
 import numpy as np
+import math
+
+from controller import Keyboard
+
+from components import Pose, Map
+from components import Manager, Localization, Mapping, SLAM, Device, RobotController
+
+
 
 #Initialization
 print("=== Initializing Grocery Shopper...")
-#Consts
-MAX_SPEED = 7.0  # [rad/s]
-MAX_SPEED_MS = 0.633 # [m/s]
-AXLE_LENGTH = 0.4044 # m
-MOTOR_LEFT = 10
-MOTOR_RIGHT = 11
-N_PARTS = 12
-LIDAR_ANGLE_BINS = 667
-LIDAR_SENSOR_MAX_RANGE = 5.5 # Meters
-LIDAR_ANGLE_RANGE = math.radians(240)
 
-# create the Robot instance.
-robot = Robot()
+m = Manager()
 
-# get the time step of the current world.
-timestep = int(robot.getBasicTimeStep())
+Localization    = Localization(m)
+Mapping         = Mapping(m)
+Slam            = SLAM(m)
+Device          = Device(m)
+RobotController = RobotController(m)
 
-# The Tiago robot has multiple motors, each identified by their names below
-part_names = ("head_2_joint", "head_1_joint", "torso_lift_joint", "arm_1_joint",
-              "arm_2_joint",  "arm_3_joint",  "arm_4_joint",      "arm_5_joint",
-              "arm_6_joint",  "arm_7_joint",  "wheel_left_joint", "wheel_right_joint",
-              "gripper_left_finger_joint","gripper_right_finger_joint")
+m.Localization    = Localization
+m.Mapping         = Mapping
+m.Slam            = SLAM
+m.Device          = Device
+m.RobotController = RobotController
 
-# 
-
-# All motors except the wheels are controlled by position control. The wheels
-# are controlled by a velocity controller. We therefore set their position to infinite.
-target_pos = (0.0, 0.0, 0.35, 0.07, 1.02, -3.16, 1.27, 1.32, 0.0, 1.41, 'inf', 'inf',0.045,0.045)
-
-robot_parts={}
-for i, part_name in enumerate(part_names):
-    robot_parts[part_name]=robot.getDevice(part_name)
-    robot_parts[part_name].setPosition(float(target_pos[i]))
-    robot_parts[part_name].setVelocity(robot_parts[part_name].getMaxVelocity() / 2.0)
-
-# Enable gripper encoders (position sensors)
-left_gripper_enc=robot.getDevice("gripper_left_finger_joint_sensor")
-right_gripper_enc=robot.getDevice("gripper_right_finger_joint_sensor")
-left_gripper_enc.enable(timestep)
-right_gripper_enc.enable(timestep)
-
-# Enable Camera
-camera = robot.getDevice('camera')
-camera.enable(timestep)
-camera.recognitionEnable(timestep)
-
-# Enable GPS and compass localization
-gps = robot.getDevice("gps")
-gps.enable(timestep)
-compass = robot.getDevice("compass")
-compass.enable(timestep)
-
-# Enable LiDAR
-lidar = robot.getDevice('Hokuyo URG-04LX-UG01')
-lidar.enable(timestep)
-lidar.enablePointCloud()
-
-# Enable display
-display = robot.getDevice("display")
-
-# Odometry
-pose_x     = 0
-pose_y     = 0
-pose_theta = 0
-
-vL = 0
-vR = 0
-
-lidar_sensor_readings = [] # List to hold sensor readings
-lidar_offsets = np.linspace(-LIDAR_ANGLE_RANGE/2., +LIDAR_ANGLE_RANGE/2., LIDAR_ANGLE_BINS)
-lidar_offsets = lidar_offsets[83:len(lidar_offsets)-83] # Only keep lidar readings not blocked by robot chassis
-
-map = None
+m.RobotController.set_waypoints([
+    (  4.80,  0.00,  0.00),
+    (  4.79, -2.13,  0.00),
+    ( -3.64, -2.03,  0.00),
+    ( -3.44, -3.04,  1.57),
+    (-12.53, -1.98,  0.00),
+    (-12.10,  1.50,  3.14),
+    (  4.91,  1.43,  0.00), #wut
+    (  4.50,  5.57,  0.00),
+    (-12.91,  5.55,  0.00),
+    (-12.44, -5.44, -3.14),
+    (  5.31, -5.69, -1.56),
+    ])
 
 
 
-# ------------------------------------------------------------------
-# Helper Functions
 
 
 gripper_status="closed"
 
+
+####################################
+####################################
+def calc_input():
+    v = 1.0  # [m/s]
+    yawrate = 0.1  # [rad/s]
+    u = np.array([[v, yawrate]]).T
+    return u
+
+# RFID positions [x, y]
+RFID = np.array([
+    [10.0, -2.0],
+    [15.0, 10.0],
+    [3.0, 15.0],
+    [-5.0, 20.0]])
+    
+# State Vector [x y yaw v]'
+STATE_SIZE = 0
+xEst = np.zeros((STATE_SIZE, 1))
+xTrue = np.zeros((STATE_SIZE, 1))
+PEst = np.eye(STATE_SIZE)
+
+xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning
+
+# history
+hxEst = xEst
+hxTrue = xTrue
+hxDR = xTrue
+
+show_animation = True
+####################################
+####################################
+
+
 # Main Loop
-while robot.step(timestep) != -1:
+while Device.robot_step() != -1:
+    vL, vR = RobotController.controller(
+        control_type='auto', 
+        vel_ratio=0.5,
+        debug=False
+    )
+    pose = Localization.get_pose()
     
+    point_cloud = Mapping.get_lidar_point_cloud(pose)
+    Mapping.display_point_cloud(point_cloud)
+
+    # image = Device.get_camera_image()
+
+    Localization.update_odometry(vL, vR, print_pose=False)
+    Device.set_wheel_joint_vel(vL, vR)
+
+
+    # slam.ekf(xEst, PEst, u, z)
+
+
+    # u = calc_input()
+    # xTrue, z, xDR, ud = slam.observation(xTrue, xDR, u, RFID)
+    # xEst, PEst = ekf_slam(xEst, PEst, ud, z)
+    # x_state = xEst[0:STATE_SIZE]
+    # # store data history
+    # hxEst = np.hstack((hxEst, x_state))
+    # hxDR = np.hstack((hxDR, xDR))
+    # hxTrue = np.hstack((hxTrue, xTrue))
+    # if show_animation:  # pragma: no cover
+    #         plt.cla()
+    #         plt.plot(RFID[:, 0], RFID[:, 1], "*k")
+    #         plt.plot(xEst[0], xEst[1], ".r")
+    #         # plot landmark
+    #         for i in range(calc_n_LM(xEst)):
+    #             plt.plot(xEst[STATE_SIZE + i * 2],
+    #                      xEst[STATE_SIZE + i * 2 + 1], "xg")
+    #         plt.plot(hxTrue[0, :],
+    #                  hxTrue[1, :], "-b")
+    #         plt.plot(hxDR[0, :],
+    #                  hxDR[1, :], "-k")
+    #         plt.plot(hxEst[0, :],
+    #                  hxEst[1, :], "-r")
+    #         plt.axis("equal")
+    #         plt.grid(True)
+    #         plt.pause(0.001)
+
+
+
     
-    robot_parts["wheel_left_joint"].setVelocity(vL)
-    robot_parts["wheel_right_joint"].setVelocity(vR)
-    
-    if(gripper_status=="open"):
-        # Close gripper, note that this takes multiple time steps...
-        robot_parts["gripper_left_finger_joint"].setPosition(0)
-        robot_parts["gripper_right_finger_joint"].setPosition(0)
-        if right_gripper_enc.getValue()<=0.005:
-            gripper_status="closed"
-    else:
-        # Open gripper
-        robot_parts["gripper_left_finger_joint"].setPosition(0.045)
-        robot_parts["gripper_right_finger_joint"].setPosition(0.045)
-        if left_gripper_enc.getValue()>=0.044:
-            gripper_status="open"
+
+
+
+
+
+    ## Temporary commented code
+    # if(gripper_status=="open"):
+    #     # Close gripper, note that this takes multiple time steps...
+    #     robot_parts["gripper_left_finger_joint"].setPosition(0)
+    #     robot_parts["gripper_right_finger_joint"].setPosition(0)
+    #     if right_gripper_enc.getValue()<=0.005:
+    #         gripper_status="closed"
+    # else:
+    #     # Open gripper
+    #     robot_parts["gripper_left_finger_joint"].setPosition(0.045)
+    #     robot_parts["gripper_right_finger_joint"].setPosition(0.045)
+    #     if left_gripper_enc.getValue()>=0.044:
+    #         gripper_status="open"
