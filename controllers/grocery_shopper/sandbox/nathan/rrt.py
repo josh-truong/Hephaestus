@@ -1,7 +1,6 @@
 from tabnanny import check
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 import random
 
 ###############################################################################
@@ -16,48 +15,7 @@ class Node:
         self.parent = parent # Parent node
         self.path_from_parent = [] # List of points along the way from the parent node (for edge's collision checking)
 
-
-def setup_random_2d_world():
-    '''
-    Function that sets a 2D world with fixed bounds and # of obstacles
-    :return: The bounds, the obstacles, the state_is_valid() function
-    '''
-    state_bounds = np.array([[0,10],[0,10]]) # matrix of min/max values for each dimension
-    obstacles = [] # [pt, radius] circular obstacles
-    for n in range(30):
-        obstacles.append(get_nd_obstacle(state_bounds))
-
-    def state_is_valid(state):
-        '''
-        Function that takes an n-dimensional point and checks if it is within the bounds and not inside the obstacle
-        :param state: n-Dimensional point
-        :return: Boolean whose value depends on whether the state/point is valid or not
-        '''
-        for dim in range(state_bounds.shape[0]):
-            if state[dim] < state_bounds[dim][0]: return False
-            if state[dim] >= state_bounds[dim][1]: return False
-        for obs in obstacles:
-            if np.linalg.norm(state - obs[0]) <= obs[1]: return False
-        return True
-
-    return state_bounds, obstacles, state_is_valid
-
-def _plot_circle(x, y, radius, color="-k"):
-    '''
-    Internal function to plot a 2D circle on the current pyplot object
-    :param x: The x coordinate of the circle
-    :param y: The y coordinate of the circle
-    :param radius: The radius of the circle
-    :param color: Matplotlib color code
-    :return: None
-    '''
-    deg = np.linspace(0,360,50)
-
-    xl = [x + radius * math.cos(np.deg2rad(d)) for d in deg]
-    yl = [y + radius * math.sin(np.deg2rad(d)) for d in deg]
-    plt.plot(xl, yl, color)
-
-def visualize_2D_graph(state_bounds, obstacles, nodes, goal_point=None, filename=None):
+def visualize_2D_graph(map, nodes, goal_point=None, filename=None):
     '''
     Function to visualise the 2D world, the RRT graph, path to goal if goal exists
     :param state_bounds: Array of min/max for each dimension
@@ -68,11 +26,8 @@ def visualize_2D_graph(state_bounds, obstacles, nodes, goal_point=None, filename
     :return: None
     '''
     fig = plt.figure()
-    plt.xlim(state_bounds[0,0], state_bounds[0,1])
-    plt.ylim(state_bounds[1,0], state_bounds[1,1])
-
-    for obs in obstacles:
-        _plot_circle(obs[0][0], obs[0][1], obs[1])
+    plt.xlim(0, len(map))
+    plt.ylim(0, len(map[1]))
 
     goal_node = None
     for node in nodes:
@@ -106,20 +61,6 @@ def visualize_2D_graph(state_bounds, obstacles, nodes, goal_point=None, filename
     else:
         plt.show()
 
-def get_random_valid_vertex(state_is_valid, bounds):
-    '''
-    Function that samples a random n-dimensional point which is valid (i.e. collision free and within the bounds)
-    :param state_valid: The state validity function that returns a boolean
-    :param bounds: The world bounds to sample points from
-    :return: n-Dimensional point/state
-    '''
-    vertex = None
-    while vertex is None: # Get starting vertex
-        pt = np.random.rand(bounds.shape[0]) * (bounds[:,1]-bounds[:,0]) + bounds[:,0]
-        if state_is_valid(pt):
-            vertex = pt
-    return vertex
-
 ###############################################################################
 ## END BASE CODE
 ###############################################################################
@@ -142,6 +83,12 @@ def get_nearest_vertex(node_list, q_point):
     # loop finds the closest node to q_point
     return minNode
 
+def state_is_valid(point, map):
+    if (map[int(point[1])][int(point[0])] == 0):
+        return True
+    return False
+    
+        
 def steer(from_point, to_point, delta_q):
     '''
     :param from_point: n-Dimensional array (point) where the path to "to_point" is originating from (e.g., [1.,2.])
@@ -157,11 +104,12 @@ def steer(from_point, to_point, delta_q):
         unit_vector = vector / np.linalg.norm(vector)
         change_vector = unit_vector * (delta_q - (delta_q / 100000)) # subtracting small amount from delta_q because sometimes the unit vector is normalized to something slightly bigger than 1
         to_point = from_point + change_vector
+        to_point = np.floor(to_point)
     # TODO Use the np.linspace function to get 10 points along the path from "from_point" to "to_point"
-    path = np.linspace(from_point, to_point, 10) 
+    path = np.floor(np.linspace(from_point, to_point, 10))
     return path
 
-def check_path_valid(path, state_is_valid):
+def check_path_valid(path, map):
     '''
     Function that checks if a path (or edge that is made up of waypoints) is collision free or not
     :param path: A 1D array containing a few (10 in our case) n-dimensional points along an edge
@@ -171,10 +119,10 @@ def check_path_valid(path, state_is_valid):
     # TODO: Your Code Here
     valid = True
     for point in path:
-        valid = valid and state_is_valid(point) # checks each point in the path, valid will become false if any of them are not valid points
+        valid = valid and state_is_valid(point, map) # checks each point in the path, valid will become false if any of them are not valid points
     return valid
 
-def rrt(state_bounds, state_is_valid, starting_point, goal_point, k, delta_q):
+def rrt(starting_point, goal_point, k, delta_q, map):
     '''
     TODO: Implement the RRT algorithm here, making use of the provided state_is_valid function.
     RRT algorithm.
@@ -200,13 +148,13 @@ def rrt(state_bounds, state_is_valid, starting_point, goal_point, k, delta_q):
         if goal_point is not None and random.random() < 0.05:
             rand = goal_point
         else:
-            rand = np.array([random.uniform(i[0], i[1]) for i in state_bounds])
+            rand = np.array([np.random.randint(0, len(map)), np.random.randint(0, len(map[1]))])
         # get closest node to new point
         near = get_nearest_vertex(node_list, rand)
         # get a path to the new point, moving it closer to the closest node if necessary
         pathToNew = steer(near.point, rand, delta_q)
         # check if the path is valid, and only then add new node to the node_list
-        if check_path_valid(pathToNew, state_is_valid):
+        if check_path_valid(pathToNew, map):
             newNode = Node(pathToNew[9], parent=near)
             newNode.path_from_parent = pathToNew
             node_list.append(newNode)
@@ -218,18 +166,14 @@ def rrt(state_bounds, state_is_valid, starting_point, goal_point, k, delta_q):
     return node_list
 
 if __name__ == "__main__":
-    K = 250 # Feel free to adjust as desired
+    K = 1000 # Feel free to adjust as desired
+    map = np.load("controllers/grocery_shopper/assets/filter_map.npy")
 
-    bounds, obstacles, validity_check = setup_random_2d_world()
-    starting_point = get_random_valid_vertex(validity_check, bounds)
-    nodes = rrt(bounds, validity_check, starting_point, None, K, np.linalg.norm(bounds/10.))
-    visualize_2D_graph(bounds, obstacles, nodes, None, 'rrt_run2.png')
-
-    bounds, obstacles, validity_check = setup_random_2d_world()
-    starting_point = get_random_valid_vertex(validity_check, bounds)
-    goal_point = get_random_valid_vertex(validity_check, bounds)
-    while np.linalg.norm(starting_point - goal_point) < np.linalg.norm(bounds/2.):
-        starting_point = get_random_valid_vertex(validity_check, bounds)
-        goal_point = get_random_valid_vertex(validity_check, bounds)
-    nodes = rrt(bounds, validity_check, starting_point, goal_point, K, np.linalg.norm(bounds/10.))
-    visualize_2D_graph(bounds, obstacles, nodes, goal_point, 'rrt_goal_run2.png')
+    starting_point = [20,200]
+    goal = np.array([325, 325])
+    nodes = rrt(starting_point, goal, K, 10, map)
+    visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
+  
+    plt.imshow(map)
+    plt.colorbar()
+    plt.show()
