@@ -164,13 +164,12 @@ class Planning:
 
         return node_list
 
-if __name__ == "__main__":
-    planner = Planning()
-    K = 1000 # Feel free to adjust as desired
-    map = np.load("controllers/grocery_shopper/assets/filter_map.npy")
+# if __name__ == "__main__":
+#     planner = Planning()
+#     K = 1000 # Feel free to adjust as desired
+#     map = np.load("controllers/grocery_shopper/assets/filter_map.npy")
 
-    starting_point = [20,200]
-    goal = np.array([325, 325])
-    nodes = planner.rrt(starting_point, goal, K, 10, map)
-    planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
-  
+#     starting_point = [20,200]
+#     goal = np.array([325, 325])
+#     nodes = planner.rrt(starting_point, goal, K, 10, map)
+#     planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
