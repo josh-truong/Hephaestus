@@ -18,13 +18,13 @@ m = Manager()
 
 Localization    = Localization(m)
 Mapping         = Mapping(m)
-Slam            = SLAM(m)
+# Slam            = SLAM(m)
 Device          = Device(m)
 RobotController = RobotController(m)
 
 m.Localization    = Localization
 m.Mapping         = Mapping
-m.Slam            = SLAM
+# m.Slam            = SLAM
 m.Device          = Device
 m.RobotController = RobotController
 
@@ -33,6 +33,18 @@ m.RobotController = RobotController
 # timeStep = Device.robot_step()
 
 # Maniplation = Manipulation(4, supervisor, timeStep)
+
+
+
+
+# planner = Planning()
+# K = 1000 # Feel free to adjust as desired
+# map = np.load("../assets/filter_map.npy")
+# starting_point = [20,200]
+# goal = np.array([325, 325])
+# nodes = planner.rrt(starting_point, goal, K, 10, map)
+# m.RobotController.set_waypoints(nodes)
+
 
 m.RobotController.set_waypoints([
     (  4.80,  0.00,  0.00),
@@ -86,10 +98,10 @@ show_animation = True
 
 
 # Main Loop
-while supervisor.step(timeStep) != -1:
+while Device.robot_step() != -1:
     vL, vR = RobotController.controller(
         control_type='auto', 
-        vel_ratio=0.5,
+        vel_ratio=0.7,
         debug=False
     )
     pose = Localization.get_pose()
@@ -102,39 +114,6 @@ while supervisor.step(timeStep) != -1:
     Localization.update_odometry(vL, vR, print_pose=False)
     Device.set_wheel_joint_vel(vL, vR)
 
-
-    # slam.ekf(xEst, PEst, u, z)
-
-
-    # u = calc_input()
-    # xTrue, z, xDR, ud = slam.observation(xTrue, xDR, u, RFID)
-    # xEst, PEst = ekf_slam(xEst, PEst, ud, z)
-    # x_state = xEst[0:STATE_SIZE]
-    # # store data history
-    # hxEst = np.hstack((hxEst, x_state))
-    # hxDR = np.hstack((hxDR, xDR))
-    # hxTrue = np.hstack((hxTrue, xTrue))
-    # if show_animation:  # pragma: no cover
-    #         plt.cla()
-    #         plt.plot(RFID[:, 0], RFID[:, 1], "*k")
-    #         plt.plot(xEst[0], xEst[1], ".r")
-    #         # plot landmark
-    #         for i in range(calc_n_LM(xEst)):
-    #             plt.plot(xEst[STATE_SIZE + i * 2],
-    #                      xEst[STATE_SIZE + i * 2 + 1], "xg")
-    #         plt.plot(hxTrue[0, :],
-    #                  hxTrue[1, :], "-b")
-    #         plt.plot(hxDR[0, :],
-    #                  hxDR[1, :], "-k")
-    #         plt.plot(hxEst[0, :],
-    #                  hxEst[1, :], "-r")
-    #         plt.axis("equal")
-    #         plt.grid(True)
-    #         plt.pause(0.001)
-
-
-
-    
 
 
 
