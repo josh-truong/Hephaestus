@@ -164,6 +164,17 @@ class Planning:
 
         return node_list
 
+    def getWaypoints(self, nodes):
+        # list of waypoints in map coords, tulpes with (x, y, theta)
+        waypoints = []
+        currNode = nodes[len(nodes) - 1]
+        while (currNode.parent != None):
+            tempList = []
+            for point in currNode.path_from_parent:
+                tempList.append((point[0], point[1], 0))
+            waypoints = tempList + waypoints
+        return waypoints
+
 if __name__ == "__main__":
     planner = Planning()
     K = 1000 # Feel free to adjust as desired
