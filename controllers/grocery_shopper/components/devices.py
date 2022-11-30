@@ -4,7 +4,7 @@ devices.py
 Created on Fri Nov 19 2022
 @Lead: Joshua Truong
 """
-
+from controller import Supervisor
 from controller import Robot
 from .constants import RobotConst
 from .mapping import Mapping as MappingClass
@@ -15,7 +15,7 @@ class Device:
         self.m = m
 
         self.robot_parts = {}
-        self.robot = Robot()
+        self.robot = Supervisor()
         self.timestep = int(self.robot.getBasicTimeStep())
 
         # Enable devices
