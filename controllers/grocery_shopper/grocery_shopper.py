@@ -55,6 +55,8 @@ for x, y, _ in waypoints:
     m.Device.display.drawPixel(x, y)
 
 
+# np.save('path.npy', [Mapping.get_display_coords(x,y) for x,y,_ in waypoints])
+
 # pt1, pt2 = (4.80, 0.00), (-13.02, -5.42)
 # pt1 = Mapping.get_display_coords(pt1[0], pt1[1])
 # pt2 = Mapping.get_display_coords(pt2[0], pt2[1])
