@@ -38,3 +38,4 @@ class Manager:
         self.Slam            = None
         self.Device          = None
         self.RobotController = None
+        self.Planning        = None
