@@ -20,6 +20,8 @@ class Node:
         self.path_from_parent = [] # List of points along the way from the parent node (for edge's collision checking)
 
 class Planning:
+    def __init__(self):
+        print("=== RRT Component Initialized...")
 
     def visualize_2D_graph(self, map, nodes, goal_point=None, filename=None):
         '''
@@ -171,21 +173,39 @@ class Planning:
 
         return node_list
 
-    def getWaypoints(self, nodes):
+
+    def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
+        x = ((display[0]*0.5) - x) / (display[0]/world[0])
+        y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
+        return x,y,0
+
+    def getWaypoints(self, nodes, goal_point):
         # list of waypoints in map coords, tulpes with (x, y, theta)
+
+        goal_node = None
         waypoints = []
-        currNode = nodes[len(nodes) - 1]
-        while (currNode.parent != None):
-            tempList = []
-            for point in currNode.path_from_parent:
-                tempList.append((point[0], point[1], 0))
-            waypoints = tempList + waypoints
-        return waypoints
+
+        # The goal may not be on the RRT so we are finding the point that is a 'proxy' for the goal
+        # for node in nodes:
+        #     if goal_point is not None and np.linalg.norm(node.point - np.array(goal_point)) <= 1e-5:
+        #         goal_node = node
+
+        goal_node = nodes[-1]
+        if goal_node is not None:
+            cur_node = goal_node
+            while cur_node is not None: 
+                if cur_node.parent is not None:
+                    waypoints.extend(cur_node.path_from_parent)
+                    cur_node = cur_node.parent
+                else:
+                    waypoints.reverse()
+                    waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
+                    return waypoints
 
 # if __name__ == "__main__":
 #     planner = Planning()
 #     K = 1000 # Feel free to adjust as desired
-#     map = np.load("controllers/grocery_shopper/assets/filter_map.npy")
+#     map = np.load("../assets/filter_map.npy")
 
 #     starting_point = [20,200]
 #     goal = np.array([325, 325])
