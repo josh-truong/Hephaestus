@@ -1,4 +1,3 @@
-
 from controller import Robot
 import math
 import numpy as np
