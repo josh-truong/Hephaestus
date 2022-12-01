@@ -29,10 +29,10 @@ m.Device          = Device
 m.RobotController = RobotController
 
 # # Initialize the Webots Supervisor.
-# supervisor = Supervisor()
-# timeStep = Device.robot_step()
+supervisor = Supervisor()
+timeStep = Device.robot_step()
 
-# Maniplation = Manipulation(4, supervisor, timeStep)
+Maniplation = Manipulation(4, supervisor, timeStep)
 
 
 

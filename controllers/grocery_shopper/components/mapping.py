@@ -1,3 +1,10 @@
+"""
+mapping.py
+
+Created on Fri Nov 19 2022
+@Lead: Joshua Truong
+"""
+
 import numpy as np
 import math
 from .utils import Map
