@@ -1,3 +1,10 @@
+"""
+planning.py
+
+Created on Tues Nov 29 2022
+@Lead: Nathan Kochera
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import random
