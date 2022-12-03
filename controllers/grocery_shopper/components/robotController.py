@@ -18,6 +18,8 @@ class RobotController:
 
         self.rtol, self.atol, self.etol = rho_tol, alpha_tol, eta_tol
         self.flex_rtol, self.flex_atol = rho_tol, alpha_tol
+        self.avoidance = False
+        self.prev_pose = Pose(0,0,0)
 
     def controller(self, control_type='man', vel_ratio=1, debug=False):
         keyboard = self.m.Device.keyboard
@@ -67,10 +69,7 @@ class RobotController:
         p2 = 0.7 # bearing
         p3 = 0.05 # heading
         x_dot, theta_dot = 0, 0
-        if (rho < self.flex_rtol):
-            self.flex_rtol += 0.01
-            theta_dot = p3*eta
-        elif (abs(alpha) > self.flex_atol):
+        if (abs(alpha) > self.flex_atol):
             self.flex_atol += 0.001
             theta_dot = p2*alpha
         else:
@@ -97,9 +96,10 @@ class RobotController:
         vL, vR = clamp(phi_l), clamp(phi_r)
 
         # Stopping criteria
-        if (rho < self.flex_rtol and abs(eta) < self.etol):
+        if (rho < self.flex_rtol):
             # Move to next waypoint criteria
             self.state += 1 if (self.state != len(self.waypoints)-1) else 0
+            self.state = np.clip(self.state, 0, len(self.waypoints)-1)
             vL, vR = 0, 0
             # A method to prevent robot oscillating
             self.flex_rtol = self.rtol
@@ -117,19 +117,61 @@ class RobotController:
             print("=========================")
         return vL, vR
 
-    def obstacle_avoidance(self, dtol=0.86, sampling=20):
-        while(self.m.Device.robot_step() != -1):
-            lidar_sensor_readings = self.m.Mapping.get_lidar_readings()
-            lDist = np.mean(lidar_sensor_readings[:sampling])
-            rDist = np.mean(lidar_sensor_readings[-sampling:])
+    def obstacle_avoidance(self, dtol=0.86, sampling=50):
+        # lidar_readings = self.m.Mapping.get_lidar_readings()
+        # n_rays = len(lidar_readings)
 
-            if (lDist > dtol and rDist > dtol):
-                break
+        # l_dist, r_dist = lidar_readings[:n_rays//2], lidar_readings[-n_rays//2:]
+        # l_dist.sort(), r_dist.sort()
+        # l_dist, r_dist = np.mean(l_dist[:sampling]), np.mean(r_dist[:sampling])
 
-            MAX_SPEED = self.m.rConst.MAX_SPEED
-            vL, vR = (MAX_SPEED*0.2, MAX_SPEED*0.1) if (lDist < rDist) else (MAX_SPEED*0.1, MAX_SPEED*0.2)
-            self.m.Localization.update_odometry(vL, vR, print_pose=False)
-            self.m.Device.set_wheel_joint_vel(vL, vR)
+        # if (l_dist > dtol and r_dist > dtol and not self.avoidance):
+        #     print("Obstacle Detected")
+        #     self.avoidance = True
+        # MS = self.m.rConst.MAX_SPEED
+        
+        
+        # if (self.m.Device.robot_step() != -1):
+            
+        #     vL, vR = (MS*0.2, -MS*0.2) if (l_dist < r_dist) else (-MS*0.2, MS*0.2)
+        #     self.m.Localization.update_odometry(vL, vR, print_pose=False)
+        #     self.m.Device.set_wheel_joint_vel(vL, vR)
+        pass
+
+
+
+
+        # while(self.m.Device.robot_step() != -1):
+        #     lidar_sensor_readings = self.m.Mapping.get_lidar_readings()
+        #     n_rays = len(lidar_sensor_readings)
+            
+        #     lDist = lidar_sensor_readings[:n_rays//2]
+        #     rDist = lidar_sensor_readings[-n_rays//2:]
+
+        #     lDist.sort()
+        #     rDist.sort()
+
+        #     lDist = np.mean(lDist[:sampling])
+        #     rDist = np.mean(rDist[:sampling])
+
+        #     if (lDist > dtol and rDist > dtol):
+        #         break
+
+        #     self.avoidance = True
+        #     MAX_SPEED = self.m.rConst.MAX_SPEED
+        #     vL, vR = (MAX_SPEED*0.2, -MAX_SPEED*0.2) if (lDist < rDist) else (-MAX_SPEED*0.2, MAX_SPEED*0.2)
+        #     self.m.Localization.update_odometry(vL, vR, print_pose=False)
+        #     self.m.Device.set_wheel_joint_vel(vL, vR)
+
+        #     rhos = [self.m.Localization.get_position_error(Pose(goal)) for goal in self.waypoints]
+        #     self.state = np.argmin(rhos)
+
+        # if (self.avoidance and (lDist <= dtol and rDist <= dtol)):
+        #     self.avoidance = False
+        #     pose = self.m.Localization.Pose
+        #     self.waypoints[self.state] = (pose.x, pose.y, pose.theta)
+        #     print(f"New pose: {self.waypoints[self.state]}")
+
 
     def set_waypoints(self, waypoints):
         self.waypoints = waypoints
@@ -146,6 +188,3 @@ class RobotController:
             self.m.Mapping.display_point_cloud(None, redraw=True)
         elif key == ord('D'):
             map.display()
-        elif key == ord('F'):
-            f_map = map.filter(tol=filter_tol)
-            map.display(f_map)
