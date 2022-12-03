@@ -8,7 +8,8 @@ Created on Fri Nov 19 2022
 import numpy as np
 import math
 from .utils import Map
-
+import imageio
+import matplotlib.pyplot as plt
 
 class Mapping:
     def __init__(self, m):
@@ -16,6 +17,7 @@ class Mapping:
         self.m = m
         self.Map = Map()
         self.robot_poses = [] # List to hold robot previous poses
+        self.variances = [0]
 
     def get_display_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = (display[0]*0.5) - (x * (display[0]/world[0]))
@@ -79,17 +81,9 @@ class Mapping:
 
     def display_point_cloud(self, point_cloud, redraw=False):
         display = self.m.Device.display
+        width, height = display.getWidth(), display.getHeight()
         if (redraw):
-            for i in range(self.Map.shape[0]*self.Map.shape[1]):
-                y, x = i // self.Map.shape[1], i % self.Map.shape[1]
-
-                display.setColor(0x000000)
-                display.drawPixel(x, y)
-
-                grayscale = int(self.Map.pixel(x, y)*255)
-                color = int(grayscale*256**2 + grayscale*256 + grayscale)
-                display.setColor(color)
-                display.drawPixel(x, y)
+            self.m.Device.redraw_display(self.Map.map)
 
         if (point_cloud is None): return
         for x, y in point_cloud:
@@ -97,8 +91,8 @@ class Mapping:
             pixel = np.clip(self.Map.pixel(x, y) + 5e-3, 0.0, 1.0)
             self.Map.update_pixel(x, y, pixel)
 
-            grayscale = int(pixel*255)
-            color = int(grayscale*256**2 + grayscale*256 + grayscale)
+            g = int(pixel*255)
+            color = int(g*256**2 + g*256 + g)
 
             display.setColor(color)
             display.drawPixel(x, y)
@@ -106,3 +100,12 @@ class Mapping:
         display.setColor(0xFF0000)
         rx, ry = self.robot_poses[-1]
         display.drawPixel(rx, ry)
+
+    def get_map_variance(self):
+        map = self.Map.map
+        variance = np.sum(map)/(map.shape[0]*map.shape[1])
+        self.variances.append(variance)
+        
+        if (len(self.variances)%4 == 0):
+            plt.plot(self.variances)
+            plt.pause(0.1)

@@ -29,7 +29,7 @@ class Map:
         self.map[y][x] = val
     
     def update_map(self, map):
-        self.map = map
+        self.map = map.astype('float64')
 
     def save(self, filename="map.npy"):
         np.save("assets/" + filename, self.map)
