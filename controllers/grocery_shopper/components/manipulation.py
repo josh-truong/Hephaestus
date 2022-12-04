@@ -9,7 +9,7 @@ class Manipulation:
     def __init__(self, maxIterations, supervisor, timeStep):
         self.supervisor = supervisor
         self.timeStep = timeStep
-        self.chain = Chain.from_urdf_file("controllers/grocery_shopper/robot_urdf.urdf")
+        self.chain = Chain.from_urdf_file("robot_urdf.urdf")
         self.maxIterations = maxIterations
         self.motors = []
         for link in self.chain.links:
