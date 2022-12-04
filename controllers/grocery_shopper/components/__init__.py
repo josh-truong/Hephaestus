@@ -10,3 +10,4 @@ from .robotController import RobotController
 from .manipulation import Manipulation
 from .planning import Planning
 from .edge_detection import EdgeDetection
+from .vision import Vision
