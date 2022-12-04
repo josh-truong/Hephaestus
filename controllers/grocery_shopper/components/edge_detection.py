@@ -1,9 +1,16 @@
+"""
+edge_detection.py
+
+Created on Sat Dec 3 2022
+@Lead: Joshua Truong
+
+Did I make my own rectangle detection algorithm?
+"""
 import numpy as np
 from collections import defaultdict
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from scipy.signal import convolve2d
-from .kmeans_clustering import kmeans_clustering
 
 class EdgeDetection():
     def __init__(self, m, frequency=25):
@@ -28,11 +35,8 @@ class EdgeDetection():
 
         map = self.m.Mapping.Map.map
         map = self.convolve(map)
-        # get_rectangles
         self.m.Device.redraw_display(map)
-        self.m.Mapping.get_map_variance()
-
-        # print("Map updated.")
+        # self.m.Mapping.get_map_variance()
 
     def convolve(self, map, ftol=1):
         grad = convolve2d(map, self.horizontal_mask, mode='same')
@@ -137,6 +141,7 @@ class EdgeDetection():
             for blob in blobs:
                 blob = np.array(blob)
                 ax.scatter(blob[:,0],blob[:,1], s=0.5)
+                ax.scatter(180, 180, s=1)
             for i, bounds in enumerate(rectangle_bounds):
                 X1,Y1  = bounds[0]
                 X2, Y2 = bounds[1]
@@ -144,4 +149,48 @@ class EdgeDetection():
                 bounding_box = Rectangle((min(X1,X2), min(Y1,Y2)), abs(X2-X1), abs(Y2-Y1), fill=None,  color='red', lw=2)
                 currentAxis.add_patch(bounding_box)
             plt.show()
-        return map
+        return rectangle_bounds
+
+    def get_obstacle_bound(self, display=False):
+        def contains_rectangle(rect1, rect2):
+            rect1_x1, rect1_y1 = rect1[0]
+            rect1_x2, rect1_y2 = rect1[1]
+            rect2_x1, rect2_y1 = rect2[0]
+            rect2_x2, rect2_y2 = rect2[1]
+            return rect1_x1 < rect2_x1 < rect2_x2 < rect1_x2 and rect1_y1 < rect2_y1 < rect2_y2 < rect1_y2
+
+        map = self.m.Mapping.Map.map
+        rectangle_bounds = self.get_rectangles(map, display=False)
+        pose = self.m.Localization.Pose
+        x, y = self.m.Mapping.get_display_coords(pose.x, pose.y)
+
+        return_bounds = []
+        for bound in rectangle_bounds:
+            (X1, Y1), (X2, Y2) = bound
+            x_min, y_min = min(X1,X2), min(Y1,Y2)
+            x_max, y_max = max(X1,X2), max(Y1,Y2)
+
+            if (x >= x_min and x <= x_max and y >= y_min and y <= y_max):
+                continue
+            return_bounds.append(bound)
+
+        parent_idx = []
+        for i in range(len(return_bounds)):
+            for j in range(len(return_bounds)):
+                rect1, rect2 = return_bounds[i], return_bounds[j]
+                if (i != j and not contains_rectangle(rect1, rect2)):
+                    parent_idx.append(i)
+        return_bounds = np.array(return_bounds)[parent_idx]
+
+        # if (display):
+        plt.imshow(map)
+        for i, bounds in enumerate(return_bounds):
+            X1,Y1  = bounds[0]
+            X2, Y2 = bounds[1]
+            currentAxis = plt.gca()
+            bounding_box = Rectangle((min(X1,X2), min(Y1,Y2)), abs(X2-X1), abs(Y2-Y1), fill=None,  color='red', lw=2)
+            currentAxis.add_patch(bounding_box)
+        plt.show(block=False)
+        plt.pause(0.1)
+        return return_bounds
+
