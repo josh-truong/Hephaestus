@@ -10,44 +10,6 @@ from components import Manager, Localization, Mapping, SLAM, Device, RobotContro
 from components import Vision
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #Initialization
 print("=== Initializing Grocery Shopper...")
 
