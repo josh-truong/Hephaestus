@@ -7,6 +7,44 @@ from controller import Supervisor
 
 from components import Pose, Map
 from components import Manager, Localization, Mapping, SLAM, Device, RobotController, Manipulation, Planning, EdgeDetection
+from components import Vision
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -126,32 +164,31 @@ start_bounding=0
 # Main Loop
 while Device.robot_step() != -1:
     vL, vR = RobotController.controller(
-        control_type='auto', 
+        control_type='man', 
         vel_ratio=0.6,
-        debug=True
+        debug=False
     )
-    pose = Localization.get_pose()
+    # pose = Localization.get_pose()
+    # point_cloud = Mapping.get_lidar_point_cloud(pose)
+    # Mapping.display_point_cloud(point_cloud)
+    # EdgeDetection.run()
+
+    # if start_bounding%200 == 0 and start_bounding!=0:
+    #     rectangle_bounds = EdgeDetection.get_obstacle_bound(display=True)
+    #     pass
+    # start_bounding += 1
     
-    point_cloud = Mapping.get_lidar_point_cloud(pose)
-    Mapping.display_point_cloud(point_cloud)
-    EdgeDetection.run()
-
-
-
-    if start_bounding%200 == 0 and start_bounding!=0:
-        rectangle_bounds = EdgeDetection.get_obstacle_bound(display=True)
-        pass
-    start_bounding += 1
     # image = Device.get_camera_image()
 
-    Localization.update_odometry(vL, vR, print_pose=False)
-    Device.set_wheel_joint_vel(vL, vR)
 
-
+    # if start_bounding%200 == 0 and start_bounding!=0:
+    #     blobs = Vision().detect(toggleShow=True)
+    #     print(blobs, len(blobs))
+    # start_bounding += 1
 
     
-
-
+    Device.set_wheel_joint_vel(vL, vR)
+    Localization.update_odometry(print_pose=False)
 
     ## Temporary commented code
     # if(gripper_status=="open"):
