@@ -56,7 +56,7 @@ class Localization:
         eta = goal.theta - self.Pose.theta
         return eta
 
-    def update_odometry(self, vL, vR, print_pose=False):
+    def update_odometry(self, print_pose=False):
         """
         Tier 2 - Localization
         Forward Kinematics - Odometry

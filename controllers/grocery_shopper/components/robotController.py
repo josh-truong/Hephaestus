@@ -156,8 +156,8 @@ class RobotController:
 
             MAX_SPEED = self.m.rConst.MAX_SPEED
             vL, vR = (MAX_SPEED*0.2, MAX_SPEED*0.1) if (lDist < rDist) else (MAX_SPEED*0.1, MAX_SPEED*0.2)
-            self.m.Localization.update_odometry(vL, vR, print_pose=False)
             self.m.Device.set_wheel_joint_vel(vL, vR)
+            self.m.Localization.update_odometry()
 
     def set_waypoints(self, waypoints):
         self.waypoints = waypoints
