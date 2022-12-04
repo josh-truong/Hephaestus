@@ -4,11 +4,15 @@ devices.py
 Created on Fri Nov 19 2022
 @Lead: Joshua Truong
 """
+
+
 from controller import Supervisor
-from controller import Robot
+from controller import Robot, Display
 from .constants import RobotConst
 from .mapping import Mapping as MappingClass
 import numpy as np
+
+
 class Device:
     def __init__(self, m):
         print("=== Device Component Initialized...")
@@ -98,3 +102,13 @@ class Device:
         keyboard = self.robot.getKeyboard()
         keyboard.enable(self.timestep)
         return keyboard
+
+    def redraw_display(self, map):
+        self.m.Mapping.Map.update_map(map)
+        width, height = map.shape
+        map = (map.T*255).astype(int)
+        map = np.dstack([map, map, map])
+
+        ir = self.display.imageNew(map.tolist(), Display.RGB, width, height)
+        self.display.imagePaste(ir, 0, 0, False)
+        self.display.imageDelete(ir)

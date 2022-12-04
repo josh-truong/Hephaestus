@@ -67,10 +67,7 @@ class RobotController:
         p2 = 0.7 # bearing
         p3 = 0.05 # heading
         x_dot, theta_dot = 0, 0
-        if (rho < self.flex_rtol):
-            self.flex_rtol += 0.01
-            theta_dot = p3*eta
-        elif (abs(alpha) > self.flex_atol):
+        if (abs(alpha) > self.flex_atol):
             self.flex_atol += 0.001
             theta_dot = p2*alpha
         else:
@@ -85,7 +82,7 @@ class RobotController:
         phi_r = x_dot + ((theta_dot * AXLE_LENGTH) / 2) # Right wheel velocity in rad/s
         
         # Normalize wheelspeed
-        turn_ratio  = 0.20 if (np.sign(phi_l) != np.sign(phi_r)) else 1
+        turn_ratio  = 0.25 if (np.sign(phi_l) != np.sign(phi_r)) else 1
         phi_l_ratio = 1 if (abs(phi_l) > abs(phi_r)) else abs(phi_l/phi_r)
         phi_r_ratio = 1 if (abs(phi_r) > abs(phi_l)) else abs(phi_r/phi_l)
         phi_l = np.sign(phi_l)*MAX_SPEED*vRatio*phi_l_ratio*turn_ratio
@@ -97,9 +94,10 @@ class RobotController:
         vL, vR = clamp(phi_l), clamp(phi_r)
 
         # Stopping criteria
-        if (rho < self.flex_rtol and abs(eta) < self.etol):
+        if (rho < self.flex_rtol):
             # Move to next waypoint criteria
             self.state += 1 if (self.state != len(self.waypoints)-1) else 0
+            self.state = np.clip(self.state, 0, len(self.waypoints)-1)
             vL, vR = 0, 0
             # A method to prevent robot oscillating
             self.flex_rtol = self.rtol
@@ -117,11 +115,41 @@ class RobotController:
             print("=========================")
         return vL, vR
 
-    def obstacle_avoidance(self, dtol=0.86, sampling=20):
+    def obstacle_avoidance(self, dtol=0.86, sampling=50):
+        # lidar_readings = self.m.Mapping.get_lidar_readings()
+        # n_rays = len(lidar_readings)
+
+        # l_dist, r_dist = lidar_readings[:n_rays//2], lidar_readings[-n_rays//2:]
+        # l_dist.sort(), r_dist.sort()
+        # l_dist, r_dist = np.mean(l_dist[:sampling]), np.mean(r_dist[:sampling])
+
+        # if (l_dist > dtol and r_dist > dtol and not self.avoidance):
+        #     print("Obstacle Detected")
+        #     self.avoidance = True
+        # MS = self.m.rConst.MAX_SPEED
+        
+        
+        # if (self.m.Device.robot_step() != -1):
+            
+        #     vL, vR = (MS*0.2, -MS*0.2) if (l_dist < r_dist) else (-MS*0.2, MS*0.2)
+        #     self.m.Localization.update_odometry(vL, vR, print_pose=False)
+        #     self.m.Device.set_wheel_joint_vel(vL, vR)
+
+
+
+
         while(self.m.Device.robot_step() != -1):
             lidar_sensor_readings = self.m.Mapping.get_lidar_readings()
-            lDist = np.mean(lidar_sensor_readings[:sampling])
-            rDist = np.mean(lidar_sensor_readings[-sampling:])
+            n_rays = len(lidar_sensor_readings)
+            
+            lDist = lidar_sensor_readings[:n_rays//2]
+            rDist = lidar_sensor_readings[-n_rays//2:]
+
+            lDist.sort()
+            rDist.sort()
+
+            lDist = np.mean(lDist[:sampling])
+            rDist = np.mean(rDist[:sampling])
 
             if (lDist > dtol and rDist > dtol):
                 break
@@ -146,6 +174,3 @@ class RobotController:
             self.m.Mapping.display_point_cloud(None, redraw=True)
         elif key == ord('D'):
             map.display()
-        elif key == ord('F'):
-            f_map = map.filter(tol=filter_tol)
-            map.display(f_map)
