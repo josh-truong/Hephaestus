@@ -1,4 +1,4 @@
-#VRML_SIM R2022b utf8
+#VRML_SIM R2023a utf8
 
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
@@ -18,8 +18,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/project
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position -2.324357982488219 0.011216856100820117 22.329952432678088
+  orientation -0.2238155776886822 0.567941126685612 0.7920539525833824 0.9233757383384784
+  position -5.948213314319182 1.1454028518302302 2.9149170052846953
 }
 TexturedBackground {
   texture "empty_office"
@@ -1077,8 +1077,8 @@ DEF beer_bottles Transform {
   ]
 }
 TiagoSteel {
-  translation -4.999382025193283 -0.00033891545420617654 0.08822459425929999
-  rotation 0.4843646646418748 0.8744759964429956 -0.02612667777185218 0.022886245872014998
+  translation -3.23782 2.64865 0.0823563
+  rotation 0.015552701242501526 0.004465040356710991 0.9998690798792982 1.57033
   controller "grocery_shopper"
   cameraSlot [
     Camera {
