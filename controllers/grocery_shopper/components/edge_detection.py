@@ -13,7 +13,7 @@ from matplotlib.patches import Rectangle
 from scipy.signal import convolve2d
 
 class EdgeDetection():
-    def __init__(self, m, frequency=25):
+    def __init__(self, m, frequency=50):
         self.m = m
         self.count = 0
         self.frequency = frequency
@@ -43,7 +43,7 @@ class EdgeDetection():
         grad += convolve2d(map, self.vertical_mask, mode='same')
         idx = grad >= ftol
         grad[~idx] = 0
-        grad[idx] = map[idx] + 0.05
+        grad[idx] = map[idx]
         grad[idx] = np.clip(grad[idx], 0.0, 1.0)
         return grad
 
@@ -190,7 +190,7 @@ class EdgeDetection():
             currentAxis = plt.gca()
             bounding_box = Rectangle((min(X1,X2), min(Y1,Y2)), abs(X2-X1), abs(Y2-Y1), fill=None,  color='red', lw=2)
             currentAxis.add_patch(bounding_box)
-        plt.show(block=False)
-        plt.pause(0.1)
+        plt.pause(3)
+        plt.close()
         return return_bounds
 

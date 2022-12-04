@@ -18,8 +18,6 @@ class RobotController:
 
         self.rtol, self.atol, self.etol = rho_tol, alpha_tol, eta_tol
         self.flex_rtol, self.flex_atol = rho_tol, alpha_tol
-        self.avoidance = False
-        self.prev_pose = Pose(0,0,0)
 
     def controller(self, control_type='man', vel_ratio=1, debug=False):
         keyboard = self.m.Device.keyboard
@@ -84,7 +82,7 @@ class RobotController:
         phi_r = x_dot + ((theta_dot * AXLE_LENGTH) / 2) # Right wheel velocity in rad/s
         
         # Normalize wheelspeed
-        turn_ratio  = 0.20 if (np.sign(phi_l) != np.sign(phi_r)) else 1
+        turn_ratio  = 0.25 if (np.sign(phi_l) != np.sign(phi_r)) else 1
         phi_l_ratio = 1 if (abs(phi_l) > abs(phi_r)) else abs(phi_l/phi_r)
         phi_r_ratio = 1 if (abs(phi_r) > abs(phi_l)) else abs(phi_r/phi_l)
         phi_l = np.sign(phi_l)*MAX_SPEED*vRatio*phi_l_ratio*turn_ratio
@@ -136,42 +134,30 @@ class RobotController:
         #     vL, vR = (MS*0.2, -MS*0.2) if (l_dist < r_dist) else (-MS*0.2, MS*0.2)
         #     self.m.Localization.update_odometry(vL, vR, print_pose=False)
         #     self.m.Device.set_wheel_joint_vel(vL, vR)
-        pass
 
 
 
 
-        # while(self.m.Device.robot_step() != -1):
-        #     lidar_sensor_readings = self.m.Mapping.get_lidar_readings()
-        #     n_rays = len(lidar_sensor_readings)
+        while(self.m.Device.robot_step() != -1):
+            lidar_sensor_readings = self.m.Mapping.get_lidar_readings()
+            n_rays = len(lidar_sensor_readings)
             
-        #     lDist = lidar_sensor_readings[:n_rays//2]
-        #     rDist = lidar_sensor_readings[-n_rays//2:]
+            lDist = lidar_sensor_readings[:n_rays//2]
+            rDist = lidar_sensor_readings[-n_rays//2:]
 
-        #     lDist.sort()
-        #     rDist.sort()
+            lDist.sort()
+            rDist.sort()
 
-        #     lDist = np.mean(lDist[:sampling])
-        #     rDist = np.mean(rDist[:sampling])
+            lDist = np.mean(lDist[:sampling])
+            rDist = np.mean(rDist[:sampling])
 
-        #     if (lDist > dtol and rDist > dtol):
-        #         break
+            if (lDist > dtol and rDist > dtol):
+                break
 
-        #     self.avoidance = True
-        #     MAX_SPEED = self.m.rConst.MAX_SPEED
-        #     vL, vR = (MAX_SPEED*0.2, -MAX_SPEED*0.2) if (lDist < rDist) else (-MAX_SPEED*0.2, MAX_SPEED*0.2)
-        #     self.m.Localization.update_odometry(vL, vR, print_pose=False)
-        #     self.m.Device.set_wheel_joint_vel(vL, vR)
-
-        #     rhos = [self.m.Localization.get_position_error(Pose(goal)) for goal in self.waypoints]
-        #     self.state = np.argmin(rhos)
-
-        # if (self.avoidance and (lDist <= dtol and rDist <= dtol)):
-        #     self.avoidance = False
-        #     pose = self.m.Localization.Pose
-        #     self.waypoints[self.state] = (pose.x, pose.y, pose.theta)
-        #     print(f"New pose: {self.waypoints[self.state]}")
-
+            MAX_SPEED = self.m.rConst.MAX_SPEED
+            vL, vR = (MAX_SPEED*0.2, MAX_SPEED*0.1) if (lDist < rDist) else (MAX_SPEED*0.1, MAX_SPEED*0.2)
+            self.m.Localization.update_odometry(vL, vR, print_pose=False)
+            self.m.Device.set_wheel_joint_vel(vL, vR)
 
     def set_waypoints(self, waypoints):
         self.waypoints = waypoints
