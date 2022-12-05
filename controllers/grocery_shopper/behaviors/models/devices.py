@@ -27,7 +27,7 @@ class Device:
         self.gps = self.enable_gps()
         self.compass = self.enable_compass()
         self.lidar = self.enable_lidar()
-        self.display = self.enable_display()
+        self.display, self.depth_display = self.enable_display()
         self.left_camera, self.right_camera, self.meta_camera, self.range_finder = self.enable_camera()
         self.keyboard = self.enable_keyboard()
 
@@ -96,7 +96,8 @@ class Device:
     def enable_display(self):
         # Enable display
         display = self.robot.getDevice("display")
-        return display
+        depth_display = self.robot.getDevice("depth display")
+        return display, depth_display
     
     def enable_keyboard(self):
         # We are using a keyboard to remote control the robot

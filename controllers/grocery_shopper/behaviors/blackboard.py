@@ -20,7 +20,7 @@ class Blackboard:
             "device/left_gripper_enc", "device/right_gripper_enc", "device/gps", 
             "device/compass", "device/lidar", "device/display", "device/keyboard", 
             "device/left_camera", "device/right_camera", "device/meta_camera", 
-            "device/range_finder", 
+            "device/range_finder", "device/depth_display",
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
             "env/goal",
             "ik/rtol", "ik/atol", "ik/etol", "ik/p1", "ik/p2", "ik/p3",
@@ -90,8 +90,9 @@ class Blackboard:
         writer.device.compass = device.compass
         writer.device.lidar = device.lidar
         writer.device.display = device.display
-        writer.device.left_camera = device.left_camera
-        writer.device.right_camera = device.right_camera
+        writer.device.depth_display = device.depth_display
+        # writer.device.left_camera = device.left_camera
+        # writer.device.right_camera = device.right_camera
         writer.device.meta_camera = device.meta_camera
         writer.device.range_finder = device.range_finder
         writer.device.keyboard = device.keyboard
