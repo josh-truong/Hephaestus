@@ -1,5 +1,5 @@
 import py_trees
-
+import numpy as np
 from controller import Supervisor
 
 from .models import RobotConstants, LidarConstants
@@ -32,8 +32,8 @@ class Blackboard:
 
         # Setting variables
         writer.debug = True
-        # writer.controller_type = 'manual'
-        writer.controller_type = 'autonomous'
+        writer.controller_type = 'manual'
+        # writer.controller_type = 'autonomous'
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
@@ -45,6 +45,7 @@ class Blackboard:
         writer.robot.ts = 0
 
         writer.env.map = Map()
+        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0

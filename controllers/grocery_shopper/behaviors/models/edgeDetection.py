@@ -8,15 +8,11 @@ Did I make my own rectangle detection algorithm?
 """
 import numpy as np
 from collections import defaultdict
-import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 class EdgeDetection():
-    def __init__(self, m, frequency=50):
-        self.m = m
-        self.count = 0
-        self.frequency = frequency
-
+    def __init__(self, writer, reader):
+        self.w, self.r = writer, reader
         self.horizontal_mask = np.array([
             [-1, -1, -1],
             [ 2,  2,  2],
@@ -28,13 +24,7 @@ class EdgeDetection():
             [-1, 2, -1],
         ])
 
-    def run(self):
-        self.count += 1
-        if (self.count%self.frequency != 0): return
-        map = self.m.Mapping.Map.map
-        # self.m.Mapping.get_map_variance()
-
-    def get_rectangles(self, map, display=False):
+    def get_rectangles(self, image, tol):
         def expand(img_mask, cur_coord):
             coordinates_in_blob = []
             coordinate_list = [cur_coord]
@@ -95,7 +85,7 @@ class EdgeDetection():
 
                 d_cx = corner_x - pt_x
                 d_cy = corner_y - pt_y
-                d_corner = np.sqrt(d_cx*d_cx + d_cy*d_cy)
+                d_corner = np.sqrt((d_cx**2).astype(int) + (d_cy**2).astype(int))
                 return np.min([d_top, d_bottom, d_left, d_right, d_corner], axis=0)
 
             blobs = np.array(blobs)
@@ -104,9 +94,10 @@ class EdgeDetection():
                 return_bounds.append(bounds[i])
                 rm_idx = np.where(residual(bounds[i], blobs[i]) > 5)
                 unclustered_blob = blobs[i][rm_idx]
-                new_map = np.zeros(map.shape)
-                new_map[unclustered_blob[:,1],unclustered_blob[:,0]] = 1
-                new_blobs = get_blobs(new_map)
+                if (len(unclustered_blob) == 0): continue
+                new_image = np.zeros(image.shape)
+                new_image[unclustered_blob[:,1],unclustered_blob[:,0]] = 1
+                new_blobs = get_blobs(new_image)
                 new_blobs_size = np.array([len(blob) for blob in new_blobs])
                 new_bounds = get_rectangle_bounds(new_blobs)
                 if (len(new_bounds) != 0):
@@ -115,69 +106,66 @@ class EdgeDetection():
 
 
         # Generate blobs
-        blobs = get_blobs(map)
+        blobs = get_blobs(image)
         blobs_size = np.array([len(blob) for blob in blobs])
-        blobs = blobs[np.where(blobs_size > 100)]
+        blobs = blobs[np.where(blobs_size >= tol)]
         rectangle_bounds = get_rectangle_bounds(blobs)
+        print(rectangle_bounds)
         rectangle_bounds = rebound_residuals(blobs, rectangle_bounds)
-
-
-        if (display):
-            fig, ax = plt.subplots()
-            ax.imshow(map)
-            for blob in blobs:
-                blob = np.array(blob)
-                ax.scatter(blob[:,0],blob[:,1], s=0.5)
-                ax.scatter(180, 180, s=1)
-            for i, bounds in enumerate(rectangle_bounds):
-                X1,Y1  = bounds[0]
-                X2, Y2 = bounds[1]
-                currentAxis = plt.gca()
-                bounding_box = Rectangle((min(X1,X2), min(Y1,Y2)), abs(X2-X1), abs(Y2-Y1), fill=None,  color='red', lw=2)
-                currentAxis.add_patch(bounding_box)
-            plt.show()
         return rectangle_bounds
 
-    def get_obstacle_bound(self, display=False):
-        def contains_rectangle(rect1, rect2):
+    def get_display_coords(self, x, y, display=(360, 360), world=(30, 15)):
+        x = (display[0]*0.5) - (x * (display[0]/world[0]))
+        y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
+        x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
+        return int(x), int(y)
+
+    def contains_rectangle(self, rect1, rect2):
             rect1_x1, rect1_y1 = rect1[0]
             rect1_x2, rect1_y2 = rect1[1]
             rect2_x1, rect2_y1 = rect2[0]
             rect2_x2, rect2_y2 = rect2[1]
             return rect1_x1 < rect2_x1 < rect2_x2 < rect1_x2 and rect1_y1 < rect2_y1 < rect2_y2 < rect1_y2
 
-        map = self.m.Mapping.Map.map
-        rectangle_bounds = self.get_rectangles(map, display=False)
-        pose = self.m.Localization.Pose
-        x, y = self.m.Mapping.get_display_coords(pose.x, pose.y)
+    def get_obstacle_bound(self, image, tol=100):
+        rectangle_bounds = self.get_rectangles(image, tol)
+        return_bounds = rectangle_bounds
 
-        return_bounds = []
-        for bound in rectangle_bounds:
-            (X1, Y1), (X2, Y2) = bound
-            x_min, y_min = min(X1,X2), min(Y1,Y2)
-            x_max, y_max = max(X1,X2), max(Y1,Y2)
+        # return_bounds = []
+        # for bound in rectangle_bounds:
+        #     (X1, Y1), (X2, Y2) = bound
+        #     x_min, y_min = min(X1,X2), min(Y1,Y2)
+        #     x_max, y_max = max(X1,X2), max(Y1,Y2)
 
-            if (x >= x_min and x <= x_max and y >= y_min and y <= y_max):
-                continue
-            return_bounds.append(bound)
+        #     # Detects if robot is in boundary, which makes boundary invalid
+        #     if (x >= x_min and x <= x_max and y >= y_min and y <= y_max):
+        #         continue
+        #     return_bounds.append(bound)
 
         parent_idx = []
         for i in range(len(return_bounds)):
             for j in range(len(return_bounds)):
                 rect1, rect2 = return_bounds[i], return_bounds[j]
-                if (i != j and not contains_rectangle(rect1, rect2)):
+                if (i != j and not self.contains_rectangle(rect1, rect2)):
                     parent_idx.append(i)
         return_bounds = np.array(return_bounds)[parent_idx]
-
-        # if (display):
-        plt.imshow(map)
-        for i, bounds in enumerate(return_bounds):
-            X1,Y1  = bounds[0]
-            X2, Y2 = bounds[1]
-            currentAxis = plt.gca()
-            bounding_box = Rectangle((min(X1,X2), min(Y1,Y2)), abs(X2-X1), abs(Y2-Y1), fill=None,  color='red', lw=2)
-            currentAxis.add_patch(bounding_box)
-        plt.pause(3)
-        plt.close()
         return return_bounds
 
+    def draw_bounds(self, bounds, color=0xFF0000):
+        display = self.w.device.display
+        map = self.r.env.map.map
+
+        width, height = map.shape
+        map = (map.T*255).astype(int)
+        map = np.dstack([map, map, map])
+        display = self.r.device.display
+        ir = display.imageNew(map.tolist(), display.RGB, width, height)
+        display.imagePaste(ir, 0, 0, False)
+        display.imageDelete(ir)
+
+        display.setColor(color)
+        for bound in bounds:
+            (X1, Y1), (X2, Y2) = bound.tolist()
+            x_min, y_min = min(X1,X2), min(Y1,Y2)
+            x_max, y_max = max(X1,X2), max(Y1,Y2)
+            display.drawRectangle(min(X1,X2), min(Y1,Y2), abs(X2-X1), abs(Y2-Y1))
