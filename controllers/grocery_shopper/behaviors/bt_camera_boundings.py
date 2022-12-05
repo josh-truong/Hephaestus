@@ -27,7 +27,8 @@ class CameraBounds(py_trees.behaviour.Behaviour):
         self.feedback_message = f"Camera detection[{self.camera_frequency - self.camera_counter}]."
         if (self.camera_counter%self.camera_frequency == 0):
             self.camera_counter = 0
-            img_mask, centroid = self.vision.detect()
+            blobs, centroid = self.vision.detect()
+            print(blobs, centroid)
             # map_bounds = self.detection.get_obstacle_bound(img_mask, 1)
             # self.detection.draw_bounds(map_bounds, 0xFFFF00)
             

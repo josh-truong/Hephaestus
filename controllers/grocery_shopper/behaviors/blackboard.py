@@ -31,7 +31,7 @@ class Blackboard:
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
-        writer.debug = True
+        writer.debug = False
         writer.controller_type = 'manual'
         # writer.controller_type = 'autonomous'
 

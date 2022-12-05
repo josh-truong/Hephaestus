@@ -33,7 +33,7 @@ class Vision:
        
         if toggleShow:
             self.show_image(img, img_mask, isObj)
-        return img_mask, self.get_blob_centroids(blobs)
+        return blobs, self.get_blob_centroids(blobs)
  
     #prints the image
     def show_image(self, img, mask, isObj):

@@ -28,6 +28,9 @@ class Device:
         self.camera = self.enable_camera()
         self.keyboard = self.enable_keyboard()
 
+        # for i in range(self.robot.getNumberOfDevices()):
+        #     print(self.robot.getDeviceByIndex(i).getName())
+
     def set_robot_parts(self, target_pos=None):
         """
         All motors except the wheels are controlled by position control. The wheels
@@ -57,6 +60,12 @@ class Device:
         camera = self.robot.getDevice('camera')
         camera.enable(self.timestep)
         # camera.recognitionEnable(self.timestep)
+        left_camera = self.robot.getDevice('MultiSense S21 left camera')
+        camera.enable(self.timestep)
+        right_camera = self.robot.getDevice('MultiSense S21 right camera')
+        camera.enable(self.timestep)
+        left_camera.metaRangeFinder = True
+        right_camera.metaRangeFinder = True
         return camera
 
     # def get_camera_image(self):

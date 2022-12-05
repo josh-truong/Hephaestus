@@ -18,21 +18,20 @@ writer, reader = blackboard.get()
 
 #Initialization
 print("=== Initializing Grocery Shopper...")
-py_trees.logging.level = py_trees.logging.Level.DEBUG
+# py_trees.logging.level = py_trees.logging.Level.DEBUG
 
 robot = reader.robot.robot
 
 
 root = py_trees.composites.Sequence("Sequence")
 root.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
-root.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
-root.add_child(FilteringMap(name="Filtering Controller", writer=writer, reader=reader))
-root.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=writer, reader=reader))
-root.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
+# root.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
+# root.add_child(FilteringMap(name="Filtering Controller", writer=writer, reader=reader))
+# root.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=writer, reader=reader))
+# root.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
 root.setup_with_descendants()
 
 # Main Loop
 while robot.step(int(robot.getBasicTimeStep())) != -1:
     root.tick_once()
-    # focal_length = reader.device.camera.getFocalLength()
-    # [(67.0, 175.0), (70.0, 111.5), (73.0, 171.0)]
+
