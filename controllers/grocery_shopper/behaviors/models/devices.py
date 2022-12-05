@@ -18,6 +18,9 @@ class Device:
         self.robot = Supervisor()
         self.timestep = int(self.robot.getBasicTimeStep())
 
+        # for i in range(self.robot.getNumberOfDevices()):
+        #     print(self.robot.getDeviceByIndex(i).getName())
+
         # Enable devices
         self.robot_parts = self.set_robot_parts()
         self.left_gripper_enc, self.right_gripper_enc = self.enable_gripper_encoders()
@@ -25,11 +28,10 @@ class Device:
         self.compass = self.enable_compass()
         self.lidar = self.enable_lidar()
         self.display = self.enable_display()
-        self.camera = self.enable_camera()
+        self.left_camera, self.right_camera, self.meta_camera, self.range_finder = self.enable_camera()
         self.keyboard = self.enable_keyboard()
 
-        # for i in range(self.robot.getNumberOfDevices()):
-        #     print(self.robot.getDeviceByIndex(i).getName())
+        
 
     def set_robot_parts(self, target_pos=None):
         """
@@ -57,16 +59,18 @@ class Device:
 
     def enable_camera(self):
         # Enable Camera
-        camera = self.robot.getDevice('camera')
-        camera.enable(self.timestep)
+        # camera = self.robot.getDevice('camera')
+        # camera.enable(self.timestep)
         # camera.recognitionEnable(self.timestep)
         left_camera = self.robot.getDevice('MultiSense S21 left camera')
-        camera.enable(self.timestep)
+        left_camera.enable(self.timestep)
         right_camera = self.robot.getDevice('MultiSense S21 right camera')
-        camera.enable(self.timestep)
-        left_camera.metaRangeFinder = True
-        right_camera.metaRangeFinder = True
-        return camera
+        right_camera.enable(self.timestep)
+        meta_camera = self.robot.getDevice('MultiSense S21 meta camera')
+        meta_camera.enable(self.timestep)
+        range_finder = self.robot.getDevice('MultiSense S21 meta range finder')
+        range_finder.enable(self.timestep)
+        return left_camera, right_camera, meta_camera, range_finder
 
     # def get_camera_image(self):
     #     """Returns (240, 135, 3) image array"""

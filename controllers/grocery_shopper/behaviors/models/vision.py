@@ -10,8 +10,9 @@ from controller import Camera
 
 #call vision.detect() and pass it a true if you want it to print the mask to the screen
 class Vision:
-    def __init__(self):
-        self.camera = Camera("camera")
+    def __init__(self, writer, reader):
+        self.w, self.r = writer, reader
+        self.camera = self.r.device.meta_camera
         self.img_height = self.camera.getHeight()
         self.img_width = self.camera.getWidth()
         self.color_ranges = []
@@ -33,7 +34,7 @@ class Vision:
        
         if toggleShow:
             self.show_image(img, img_mask, isObj)
-        return blobs, self.get_blob_centroids(blobs)
+        return self.get_blob_centroids(blobs), blobs
  
     #prints the image
     def show_image(self, img, mask, isObj):
@@ -44,11 +45,6 @@ class Vision:
             img = img.transpose(1, 0, 2)
             axs[0].imshow(img)
             axs[1].imshow(mask)
-            
-            axs[0].set_xticklabels([])
-            axs[0].set_yticklabels([])
-            axs[1].set_xticklabels([])
-            axs[1].set_yticklabels([])
             plt.tight_layout()
             plt.show()
         return

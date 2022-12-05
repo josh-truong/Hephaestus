@@ -110,7 +110,6 @@ class EdgeDetection():
         blobs_size = np.array([len(blob) for blob in blobs])
         blobs = blobs[np.where(blobs_size >= tol)]
         rectangle_bounds = get_rectangle_bounds(blobs)
-        print(rectangle_bounds)
         rectangle_bounds = rebound_residuals(blobs, rectangle_bounds)
         return rectangle_bounds
 
