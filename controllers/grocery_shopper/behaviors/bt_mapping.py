@@ -1,8 +1,9 @@
 import py_trees
+from .models import MappingModel
 
-class Template(py_trees.behaviour.Behaviour):
+class Mapping(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
-        super(Template, self).__init__(name)
+        super(Mapping, self).__init__(name)
         self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
 
@@ -11,15 +12,20 @@ class Template(py_trees.behaviour.Behaviour):
 
     def setup(self):
         self.log_message("setup()")
+        self.MapModel = MappingModel(self.w, self.r)
 
     def initialise(self):
-        self.log_message("initialise()")
+        # self.log_message("initialise()")
+        pass
 
     def update(self):
-        self.feedback_message = ""
+        pose = self.r.robot.pose
+        point_cloud = self.MapModel.get_lidar_point_cloud(pose)
+        self.MapModel.display_point_cloud(point_cloud)
+        self.feedback_message = f"{len(point_cloud)} lidar points detected."
         self.log_message("update()", self.feedback_message)
         return py_trees.common.Status.SUCCESS
-        # return py_trees.common.Status.RUNNING
         
     def terminate(self, new_status):
-        self.log_message("terminate()", "%s->%s" % (self.status, new_status))
+        # self.log_message("terminate()", "%s->%s" % (self.status, new_status))
+        pass
