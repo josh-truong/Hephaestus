@@ -1,7 +1,7 @@
 import numpy as np
 from .utils import Pose
 from .localization import Localization
-from .planning import Planning
+
 from scipy.signal import convolve2d
 
 class ControllerModel():
@@ -77,6 +77,12 @@ class ControllerModel():
         # Stopping criteria
         if (rho < self.flex_rtol):
             # Move to next waypoint criteria
+            if (state == len(waypoints)-1):
+                self.w.env.check_state = True
+                self.w.env.num_completed_paths += 1
+                self.w.env.rerun_rrt = True
+                if (self.w.env.num_completed_paths == 10 and self.w.env.behavior_state == 0):
+                    self.w.env.behavior_state = 1
             state += 1 if (state != len(waypoints)-1) else 0
             state = np.clip(state, 0, len(waypoints)-1)
             self.w.env.state = state
@@ -95,19 +101,3 @@ class ControllerModel():
             print(f"x_dot: {x_dot:< 6.2f} theta_dot: {theta_dot:< 6.2f}")
             print(F"vL: {vL:< 6.2f} vR: {vR:< 6.2f}")
         return vL, vR
-
-    def convertMapToConfigSpace(self, map):
-        kernel = np.ones((10,10))
-        map = convolve2d(map, kernel, mode='same')
-        map[map > 0] = 1
-        return map
-
-    def obstacle_avoidance(self, dtol=0.86, sampling=50):
-        robotPose = self.r.robot.pose
-        randPoint = np.random.randint(0,360,2)
-        planner = Planning()
-        map = self.convertMapToConfigSpace(self.r.env.map.map)
-        nodes = planner.rrt([robotPose.x, robotPose.y], randPoint, 1000, 10, map)
-        waypoints = planner.getWaypoints(nodes)
-        self.w.env.waypoints = waypoints
-        self.w.env.state = 0

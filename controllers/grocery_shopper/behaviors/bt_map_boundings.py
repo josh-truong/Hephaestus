@@ -13,7 +13,7 @@ class MapBounds(py_trees.behaviour.Behaviour):
 
     def setup(self):
         self.log_message("setup()")
-        self.map_frequency = self.r.env.refresh_hz
+        self.map_frequency = self.r.env.refresh_hz*4
         self.map_counter = 0
         self.detection = EdgeDetection(self.w, self.r)
 

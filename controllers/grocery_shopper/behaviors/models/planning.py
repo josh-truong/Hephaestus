@@ -179,7 +179,7 @@ class Planning:
         y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
         return x,-y,0
 
-    def getWaypoints(self):
+    def getWaypoints(self, nodes):
         # list of waypoints in map coords, tulpes with (x, y, theta)
         waypoints = []
 
