@@ -179,16 +179,16 @@ class Planning:
         y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
         return x,-y,0
 
-    def getWaypoints(self, nodes, goal_point):
+    def getWaypoints(self):
         # list of waypoints in map coords, tulpes with (x, y, theta)
-
-        goal_node = None
         waypoints = []
 
         # The goal may not be on the RRT so we are finding the point that is a 'proxy' for the goal
         # for node in nodes:
         #     if goal_point is not None and np.linalg.norm(node.point - np.array(goal_point)) <= 1e-5:
         #         goal_node = node
+
+
 
         goal_node = nodes[-1]
         if goal_node is not None:
@@ -202,13 +202,13 @@ class Planning:
                     waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
                     return waypoints
 
-# if __name__ == "__main__":
-#     planner = Planning()
-#     K = 1000 # Feel free to adjust as desired
-#     map = np.load("../assets/filter_map.npy")
+if __name__ == "__main__":
+    planner = Planning()
+    K = 1000 # Feel free to adjust as desired
+    map = np.load("../assets/filter_map.npy")
 
-#     starting_point = [20,200]
-#     goal = np.array([325, 325])
-#     nodes = planner.rrt(starting_point, goal, K, 10, map)
-#     planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
+    starting_point = [20,200]
+    goal = np.array([325, 325])
+    nodes = planner.rrt(starting_point, goal, K, 10, map)
+    planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
   

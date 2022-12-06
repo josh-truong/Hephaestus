@@ -8,6 +8,6 @@ from .mapping import Mapping
 from .slam import SLAM
 from .robotController import RobotController
 from .manipulation import Manipulation
-from .planning import Planning
+from ..behaviors.models.planning import Planning
 from .edge_detection import EdgeDetection
 from .vision import Vision
