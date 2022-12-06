@@ -1,7 +1,7 @@
 import py_trees
 from .models import Planning
 import numpy as np
-from scipy.signal import convolve2d
+from .models import ConfigSpace
 
 class RRT(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -17,15 +17,10 @@ class RRT(py_trees.behaviour.Behaviour):
         self.planner = Planning()
 
     def initialise(self):
-        self.log_message("initialise()")
+        # self.log_message("initialise()")
+        pass
 
     def update(self):
-        def convertMapToConfigSpace(map):
-            kernel = np.ones((10,10))
-            map = convolve2d(map, kernel, mode='same')
-            map[map > 0] = 1
-            return map
-
         if (not self.r.env.rerun_rrt): return py_trees.common.Status.SUCCESS
         robotPose = self.r.robot.pose
         def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
@@ -36,9 +31,7 @@ class RRT(py_trees.behaviour.Behaviour):
         x, y = get_display_coords(robotPose.x, -1 * robotPose.y)
         randPoint = np.random.randint(0,360,2)
         
-        map = convertMapToConfigSpace(self.r.env.map.map)
-
-        print([x, y], randPoint)
+        map = ConfigSpace().run(self.r.env.map.map)
         nodes = self.planner.rrt([x, y], randPoint, 1000, 10, map)
         waypoints = self.planner.getWaypoints(nodes)
         self.w.env.waypoints = waypoints

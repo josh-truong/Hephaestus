@@ -4,6 +4,9 @@ import numpy as np
 import py_trees
 import matplotlib.pyplot as plt
 
+from behaviors.models import Localization
+from behaviors.models import Planning
+from behaviors.models import ConfigSpace
 from behaviors import Blackboard
 from behaviors import Controller
 from behaviors import Mapping
@@ -11,6 +14,7 @@ from behaviors import FilteringMap
 from behaviors import MapBounds
 from behaviors import CameraBounds
 from behaviors import ObstacleAvoidance
+from behaviors import Planning
 from behaviors import RRT
 
 blackboard = Blackboard()
@@ -20,6 +24,17 @@ writer, reader = blackboard.get()
 #Initialization
 print("=== Initializing Grocery Shopper...")
 robot = reader.robot.robot
+robot.step(int(robot.getBasicTimeStep()))
+writer.robot.pose = Localization(writer, reader).get_pose()
+pose = reader.robot.pose
+planning = Planning()
+nodes = planning.rrt(
+    starting_point=(pose.x, pose.y), 
+    goal_point=np.random.randint(0,360,2), 
+    k=1000, 
+    delta_q=10, 
+    map=ConfigSpace().run(reader.env.map.map))
+writer.env.waypoints = planning.getWaypoints(nodes)
 
 autonomous_mapping = py_trees.composites.Sequence("Sequence")
 autonomous_mapping.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))

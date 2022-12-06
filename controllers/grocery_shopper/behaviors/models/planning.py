@@ -182,14 +182,6 @@ class Planning:
     def getWaypoints(self, nodes):
         # list of waypoints in map coords, tulpes with (x, y, theta)
         waypoints = []
-
-        # The goal may not be on the RRT so we are finding the point that is a 'proxy' for the goal
-        # for node in nodes:
-        #     if goal_point is not None and np.linalg.norm(node.point - np.array(goal_point)) <= 1e-5:
-        #         goal_node = node
-
-
-
         goal_node = nodes[-1]
         if goal_node is not None:
             cur_node = goal_node

@@ -7,3 +7,4 @@ from .mappingModel import MappingModel
 from .edgeDetection import EdgeDetection
 from .vision import Vision
 from .planning import Planning
+from .configSpace import ConfigSpace

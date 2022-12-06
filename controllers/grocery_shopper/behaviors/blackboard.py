@@ -34,14 +34,14 @@ class Blackboard:
 
         # Setting variables
         # py_trees.logging.level = py_trees.logging.Level.DEBUG
-        writer.debug = True
+        writer.debug = False
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
 
-        writer.robot.pose = Pose(5.29, 0.10)
+        writer.robot.pose = Pose()
         writer.robot.velocity_rate = 0.6
         writer.robot.vL = 0
         writer.robot.vR = 0
