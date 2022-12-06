@@ -13,5 +13,5 @@ renderingDevicePerspectives: TIAGo Steel:MultiSense S21 left camera;0;1;0;0
 renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta camera;1;1;0;0.00346021
 renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta range finder;1;1;0.154188;0.00572748
 renderingDevicePerspectives: TIAGo Steel:MultiSense S21 right camera;0;1;0.153553;0
-renderingDevicePerspectives: TIAGo Steel:depth display;1;1.04444;0;0.233107
-renderingDevicePerspectives: TIAGo Steel:display;1;0.401906;0;0.660449
+renderingDevicePerspectives: TIAGo Steel:depth display;0;1.88334;0;0.233105
+renderingDevicePerspectives: TIAGo Steel:display;1;0.401906;0;0.22804

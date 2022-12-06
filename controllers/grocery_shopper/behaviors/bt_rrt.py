@@ -33,7 +33,7 @@ class RRT(py_trees.behaviour.Behaviour):
             y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
             x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
             return [int(x), int(y)]
-        x, y = get_display_coords(robotPose.x, robotPose.y)
+        x, y = get_display_coords(robotPose.x, -1 * robotPose.y)
         randPoint = np.random.randint(0,360,2)
         
         map = convertMapToConfigSpace(self.r.env.map.map)
