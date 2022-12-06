@@ -36,6 +36,7 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             lidar_sensor_readings = lidar_sensor_readings[83:len(lidar_sensor_readings)-83]
             return lidar_sensor_readings
 
+        self.counter += 1
         if (self.r.env.check_state):
             self.w.env.check_state = False
         elif(self.counter%self.frequency == 0):
@@ -49,8 +50,8 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         mean_dist = np.mean(lidar_readings[idx])
         if (mean_dist <= 1):
             self.feedback_message = "Obstacle Detected!"
-            self.w.env.rerun_rrt = True
-            
+            # self.w.env.rerun_rrt = True
+
         print(idx)
         print(lidar_readings[idx])
 
