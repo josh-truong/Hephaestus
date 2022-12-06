@@ -19,6 +19,7 @@ class Mapping(py_trees.behaviour.Behaviour):
         pass
 
     def update(self):
+        if (self.r.device.disable_lidar): return py_trees.common.Status.SUCCESS
         pose = self.r.robot.pose
         point_cloud = self.MapModel.get_lidar_point_cloud(pose)
         self.MapModel.display_point_cloud(point_cloud)

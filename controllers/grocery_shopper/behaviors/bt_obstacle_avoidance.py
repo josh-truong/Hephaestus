@@ -1,6 +1,7 @@
 import py_trees
 import numpy as np
 from scipy.signal import convolve2d
+from .models import ConfigSpace
 
 class ObstacleAvoidance(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -25,11 +26,6 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
             x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
             return [int(x), int(y)]
-        def convertMapToConfigSpace(map):
-            kernel = np.ones((10,10))
-            map = convolve2d(map, kernel, mode='same')
-            map[map > 0] = 1
-            return map
         def get_lidar_readings():
             lidar = self.r.device.lidar
             lidar_sensor_readings = lidar.getRangeImage()
@@ -66,7 +62,7 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         waypoint = waypoints[state]
 
         x, y = get_display_coords(waypoint[0], waypoint[1])
-        map = convertMapToConfigSpace(self.r.env.map.map)
+        map = ConfigSpace().run(self.r.env.map.map)
         self.feedback_message = ""
         if (map[y][x] == 1):
             self.feedback_message = "Obstacle Detected!"

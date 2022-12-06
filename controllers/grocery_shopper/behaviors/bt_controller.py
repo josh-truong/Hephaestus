@@ -39,6 +39,9 @@ class Controller(py_trees.behaviour.Behaviour):
         elif (controller_type == 'autonomous'):
             vL, vR = self.Driver.autonomous(velocity_rate)
 
+
+        self.w.device.disable_lidar = (np.sign(vL) != np.sign(vR))
+
         self.w.robot.vL, self.w.robot.vR = vL, vR
         self.Driver.set_wheel_joint_vel(vL, vR)
         self.Driver.localization.update_odometry()

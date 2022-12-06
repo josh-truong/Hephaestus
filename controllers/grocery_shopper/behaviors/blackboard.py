@@ -20,7 +20,7 @@ class Blackboard:
             "device/left_gripper_enc", "device/right_gripper_enc", "device/gps", 
             "device/compass", "device/lidar", "device/display", "device/keyboard", 
             "device/left_camera", "device/right_camera", "device/meta_camera", 
-            "device/range_finder", "device/depth_display",
+            "device/range_finder", "device/depth_display", "device/disable_lidar",
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
             "env/goal", "env/object_location", "env/rerun_rrt",
             "env/num_completed_paths", "env/behavior_state", "env/check_state",
@@ -103,6 +103,7 @@ class Blackboard:
         writer.device.meta_camera = device.meta_camera
         writer.device.range_finder = device.range_finder
         writer.device.keyboard = device.keyboard
+        writer.device.disable_lidar = False
 
         writer.robot.vL = 0
         writer.robot.vR = 0
