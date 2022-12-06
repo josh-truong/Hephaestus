@@ -33,8 +33,8 @@ class Blackboard:
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
-        py_trees.logging.level = py_trees.logging.Level.DEBUG
-        writer.debug = True
+        # py_trees.logging.level = py_trees.logging.Level.DEBUG
+        writer.debug = False
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
 
