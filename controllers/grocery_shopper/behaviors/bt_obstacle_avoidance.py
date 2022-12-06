@@ -45,18 +45,6 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             return py_trees.common.Status.SUCCESS
 
 
-        lidar_readings = np.array(get_lidar_readings())
-        idx = np.argsort(lidar_readings)[:50]
-        mean_dist = np.mean(lidar_readings[idx])
-        if (mean_dist <= 1):
-            self.feedback_message = "Obstacle Detected!"
-            # self.w.env.rerun_rrt = True
-
-        print(idx)
-        print(lidar_readings[idx])
-
-
-
         waypoints = self.r.env.waypoints
         state = self.r.env.state
         state = state if (state == len(waypoints)-1) else state+1
