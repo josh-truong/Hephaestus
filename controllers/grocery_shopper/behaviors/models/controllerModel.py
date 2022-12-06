@@ -103,7 +103,6 @@ class ControllerModel():
         return map
 
     def obstacle_avoidance(self, dtol=0.86, sampling=50):
-
         robotPose = self.r.robot.pose
         randPoint = np.random.randint(0,360,2)
         planner = Planning()
