@@ -83,7 +83,7 @@ class ControllerModel():
                 self.w.env.rerun_rrt = True
                 if (self.w.env.num_completed_paths == 10 and self.w.env.behavior_state == 0):
                     self.w.env.behavior_state = 1
-            state += 1 if (state != len(waypoints)-1) else 0
+            state += 15 if (state != len(waypoints)-1) else 0
             state = np.clip(state, 0, len(waypoints)-1)
             self.w.env.state = state
             vL, vR = 0, 0
@@ -100,4 +100,5 @@ class ControllerModel():
             print(f"    rho: {rho:< 6.2f}     alpha: {alpha:< 6.2f}     eta: {eta:< 6.2f}")
             print(f"x_dot: {x_dot:< 6.2f} theta_dot: {theta_dot:< 6.2f}")
             print(F"vL: {vL:< 6.2f} vR: {vR:< 6.2f}")
+            print("================================================")
         return vL, vR
