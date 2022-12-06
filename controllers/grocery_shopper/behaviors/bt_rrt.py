@@ -22,6 +22,7 @@ class RRT(py_trees.behaviour.Behaviour):
 
     def update(self):
         if (not self.r.env.rerun_rrt): return py_trees.common.Status.SUCCESS
+        print("Rerunning RRT")
         robotPose = self.r.robot.pose
         def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
             x = (display[0]*0.5) - (x * (display[0]/world[0]))
@@ -29,10 +30,9 @@ class RRT(py_trees.behaviour.Behaviour):
             x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
             return [int(x), int(y)]
         x, y = get_display_coords(robotPose.x, -1 * robotPose.y)
-        randPoint = np.random.randint(0,360,2)
-        
+
         map = ConfigSpace().run(self.r.env.map.map)
-        nodes = self.planner.rrt([x, y], randPoint, 1000, 10, map)
+        nodes = self.planner.rrt([x, y], np.random.randint(0,360,2), 1000, 10, map)
         waypoints = self.planner.getWaypoints(nodes)
         self.w.env.waypoints = waypoints
         self.w.env.state = 0
