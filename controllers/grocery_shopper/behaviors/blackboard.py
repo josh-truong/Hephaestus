@@ -22,7 +22,7 @@ class Blackboard:
             "device/left_camera", "device/right_camera", "device/meta_camera", 
             "device/range_finder", "device/depth_display",
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
-            "env/goal",
+            "env/goal", "env/object_location",
             "ik/rtol", "ik/atol", "ik/etol", "ik/p1", "ik/p2", "ik/p3",
             "robot/pose","robot/robot", "robot/parts", "robot/vL", "robot/vR", 
             "robot/velocity_rate", "robot/ts",
@@ -32,9 +32,10 @@ class Blackboard:
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = False
-        writer.controller_type = 'manual'
-        # writer.controller_type = 'autonomous'
+        # writer.controller_type = 'manual'
+        writer.controller_type = 'autonomous'
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
@@ -62,6 +63,7 @@ class Blackboard:
             (-13.01,  5.51,  0.00),
             (-13.24, -5.64,  0.00)
         ]
+        writer.env.object_location = []
 
         writer.ik.rtol = 0.2
         writer.ik.atol = 3.14/10

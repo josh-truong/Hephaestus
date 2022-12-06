@@ -16,7 +16,7 @@ class CameraBounds(py_trees.behaviour.Behaviour):
 
     def setup(self):
         self.log_message("setup()")
-        self.camera_frequency = self.r.env.refresh_hz*1
+        self.camera_frequency = self.r.env.refresh_hz*2
         self.camera_counter = 0
         self.detection = EdgeDetection(self.w, self.r)
         self.vision = Vision(self.w, self.r)
@@ -26,6 +26,12 @@ class CameraBounds(py_trees.behaviour.Behaviour):
         pass
 
     def update(self):
+        def get_lidar_readings():
+            lidar = self.r.device.lidar
+            lidar_sensor_readings = lidar.getRangeImage()
+            lidar_sensor_readings = lidar_sensor_readings[83:len(lidar_sensor_readings)-83]
+            return np.array(lidar_sensor_readings)
+
         self.camera_counter += 1
         self.feedback_message = f"Camera detection[{self.camera_frequency - self.camera_counter}]."
         if (self.camera_counter%self.camera_frequency == 0):
@@ -38,14 +44,14 @@ class CameraBounds(py_trees.behaviour.Behaviour):
             range_image = np.frombuffer(image_bytes, dtype=np.float32)
 
 
-            map = range_image.reshape(-1, range_width)
-            im = plt.imshow(map)
-            map = im.cmap(im.norm(im.get_array()))
-            map = np.delete(map, 3, 2)*255
-            depth_display = self.r.device.depth_display
-            ir = depth_display.imageNew(map.tolist(), depth_display.RGB)
-            depth_display.imagePaste(ir, 0, 0, False)
-            depth_display.imageDelete(ir)
+            # map = range_image.reshape(-1, range_width)
+            # im = plt.imshow(map)
+            # map = im.cmap(im.norm(im.get_array()))
+            # map = np.delete(map, 3, 2)*255
+            # depth_display = self.r.device.depth_display
+            # ir = depth_display.imageNew(map.tolist(), depth_display.RGB)
+            # depth_display.imagePaste(ir, 0, 0, False)
+            # depth_display.imageDelete(ir)
 
             for i, centroid in enumerate(centroids):
                 y, x = centroid
@@ -53,17 +59,26 @@ class CameraBounds(py_trees.behaviour.Behaviour):
 
                 if (depth < range_finder.getMinRange() or range_finder.getMaxRange() < depth): continue
 
-                fov = range_finder.getFov()
-                offset = np.linspace(-fov/2., fov/2., range_width)
-                alpha = offset[int(x)]
+                lidar_readings = get_lidar_readings()
+                n = len(lidar_readings)
+                is_left = (centroid[0] < 120)
+                readings = lidar_readings[:n//2] if(is_left) else lidar_readings[n//2:]
+                idx = np.argmin(np.abs(readings-depth))
+                idx = idx if (is_left) else idx+(n//2)
+                alpha = self.r.constants.lidar.OFFSETS[idx]
                 pose = self.r.robot.pose
                 rx = -math.cos(alpha)*depth + 0.202
                 ry = math.sin(alpha)*depth -0.004
                 # Convert detection from robot coordinates into world coordinates
                 wx =  math.cos(pose.theta)*rx - math.sin(pose.theta)*ry + pose.x
                 wy =  +(math.sin(pose.theta)*rx + math.cos(pose.theta)*ry) + pose.y
-                print(range_finder.getMinRange(), range_finder.getMaxRange())
-                print(len(blobs[i]), centroid, depth, wx, wy)
+                self.w.env.object_location.append([wx, wy, depth])
+                
+                # print(len(blobs[i]), depth, wx, wy)
+
+
+
+
             # map_bounds = self.detection.get_obstacle_bound(img_mask, 1)
             # self.detection.draw_bounds(map_bounds, 0xFFFF00)
             
