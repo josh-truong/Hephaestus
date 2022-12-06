@@ -30,6 +30,11 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             map = convolve2d(map, kernel, mode='same')
             map[map > 0] = 1
             return map
+        def get_lidar_readings():
+            lidar = self.r.device.lidar
+            lidar_sensor_readings = lidar.getRangeImage()
+            lidar_sensor_readings = lidar_sensor_readings[83:len(lidar_sensor_readings)-83]
+            return lidar_sensor_readings
 
         if (self.r.env.check_state):
             self.w.env.check_state = False
@@ -37,6 +42,19 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             self.w.env.check_state = True
         else:
             return py_trees.common.Status.SUCCESS
+
+
+        lidar_readings = np.array(get_lidar_readings())
+        idx = np.argsort(lidar_readings)[:50]
+        mean_dist = np.mean(lidar_readings[idx])
+        if (mean_dist <= 1):
+            self.feedback_message = "Obstacle Detected!"
+            self.w.env.rerun_rrt = True
+            
+        print(idx)
+        print(lidar_readings[idx])
+
+
 
         waypoints = self.r.env.waypoints
         state = self.r.env.state
