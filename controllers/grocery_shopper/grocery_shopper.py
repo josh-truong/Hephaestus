@@ -16,6 +16,8 @@ from behaviors import CameraBounds
 from behaviors import ObstacleAvoidance
 from behaviors import Planning
 from behaviors import RRT
+from behaviors import Reverse
+
 
 blackboard = Blackboard()
 writer, reader = blackboard.get()
@@ -38,11 +40,12 @@ writer.env.waypoints = planning.getWaypoints(nodes)
 
 autonomous_mapping = py_trees.composites.Sequence("Sequence")
 autonomous_mapping.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
+# autonomous_mapping.add_child(Controller(name="Reverse Robot", writer=writer, reader=reader))
 autonomous_mapping.add_child(ObstacleAvoidance(name="Avoiding Obstacle", writer=writer, reader=reader))
 autonomous_mapping.add_child(RRT(name="RRT", writer=writer, reader=reader))
 autonomous_mapping.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
 autonomous_mapping.add_child(FilteringMap(name="Filtering Controller", writer=writer, reader=reader))
-autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
+# autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
 autonomous_mapping.setup_with_descendants()
 
 path_planning = py_trees.composites.Sequence("Sequence")
