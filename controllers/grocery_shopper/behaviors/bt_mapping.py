@@ -1,5 +1,6 @@
 import py_trees
 from .models import MappingModel
+from .models import DisplayOverlays
 
 class Mapping(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -13,6 +14,7 @@ class Mapping(py_trees.behaviour.Behaviour):
     def setup(self):
         self.log_message("setup()")
         self.MapModel = MappingModel(self.w, self.r)
+        self.Display = DisplayOverlays(self.w, self.r)
 
     def initialise(self):
         # self.log_message("initialise()")
@@ -22,9 +24,12 @@ class Mapping(py_trees.behaviour.Behaviour):
         if (self.r.device.disable_lidar): return py_trees.common.Status.SUCCESS
         pose = self.r.robot.pose
         point_cloud = self.MapModel.get_lidar_point_cloud(pose)
-        self.MapModel.display_point_cloud(point_cloud)
+        self.Display.display_point_cloud(point_cloud)
+        self.Display.draw_robot_position()
+
         self.feedback_message = f"{len(point_cloud)} lidar points detected."
         self.log_message("update()", self.feedback_message)
+
         return py_trees.common.Status.SUCCESS
         
     def terminate(self, new_status):

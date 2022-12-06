@@ -3,7 +3,7 @@ import numpy as np
 import math
 from .models import EdgeDetection, Vision
 import matplotlib.pyplot as plt
-
+from .models import DisplayOverlays
 
 class CameraBounds(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -19,6 +19,7 @@ class CameraBounds(py_trees.behaviour.Behaviour):
         self.camera_frequency = self.r.env.refresh_hz*2
         self.camera_counter = 0
         self.detection = EdgeDetection(self.w, self.r)
+        self.display = DisplayOverlays(self.w, self.r)
         self.vision = Vision(self.w, self.r)
 
     def initialise(self):
@@ -36,23 +37,20 @@ class CameraBounds(py_trees.behaviour.Behaviour):
         self.feedback_message = f"Camera detection[{self.camera_frequency - self.camera_counter}]."
         if (self.camera_counter%self.camera_frequency == 0):
             self.camera_counter = 0
-            centroids, blobs = self.vision.detect(toggleShow=False)
+            centroids, blobs, img_mask = self.vision.detect(toggleShow=False)
 
             range_finder = self.r.device.range_finder
             range_width = range_finder.getWidth() 
             image_bytes = range_finder.getRangeImage(data_type="buffer")
             range_image = np.frombuffer(image_bytes, dtype=np.float32)
 
+            # Update depth display
+            self.display.update_depth_display(range_image, range_width)
+            object_blobs = self.detection.return_blobs(img_mask)
+            object_bounds = self.detection.return_bounds(blobs)
+            self.display.draw_object_bounds(self.r.device.depth_display, object_bounds)
 
-            # map = range_image.reshape(-1, range_width)
-            # im = plt.imshow(map)
-            # map = im.cmap(im.norm(im.get_array()))
-            # map = np.delete(map, 3, 2)*255
-            # depth_display = self.r.device.depth_display
-            # ir = depth_display.imageNew(map.tolist(), depth_display.RGB)
-            # depth_display.imagePaste(ir, 0, 0, False)
-            # depth_display.imageDelete(ir)
-
+            # Estimate object position
             for i, centroid in enumerate(centroids):
                 y, x = centroid
                 depth = range_image[int(y*range_width + x)]
@@ -61,11 +59,13 @@ class CameraBounds(py_trees.behaviour.Behaviour):
 
                 lidar_readings = get_lidar_readings()
                 n = len(lidar_readings)
+
                 is_left = (centroid[0] < 120)
                 readings = lidar_readings[:n//2] if(is_left) else lidar_readings[n//2:]
                 idx = np.argmin(np.abs(readings-depth))
                 idx = idx if (is_left) else idx+(n//2)
-                alpha = self.r.constants.lidar.OFFSETS[idx]
+                offset = self.r.constants.lidar.OFFSETS
+                alpha = offset[idx]
                 pose = self.r.robot.pose
                 rx = -math.cos(alpha)*depth + 0.202
                 ry = math.sin(alpha)*depth -0.004
@@ -73,14 +73,6 @@ class CameraBounds(py_trees.behaviour.Behaviour):
                 wx =  math.cos(pose.theta)*rx - math.sin(pose.theta)*ry + pose.x
                 wy =  +(math.sin(pose.theta)*rx + math.cos(pose.theta)*ry) + pose.y
                 self.w.env.object_location.append([wx, wy, depth])
-                
-                # print(len(blobs[i]), depth, wx, wy)
-
-
-
-
-            # map_bounds = self.detection.get_obstacle_bound(img_mask, 1)
-            # self.detection.draw_bounds(map_bounds, 0xFFFF00)
             
         
         self.log_message("update()", self.feedback_message)
