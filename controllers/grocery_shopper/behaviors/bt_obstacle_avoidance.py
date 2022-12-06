@@ -65,8 +65,8 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         map = ConfigSpace().run(self.r.env.map.map)
         self.feedback_message = ""
         if (map[y][x] == 1):
+            self.w.robot.reverse = True
             self.feedback_message = "Obstacle Detected!"
-            self.w.env.rerun_rrt = True
         self.log_message("update()", self.feedback_message)
         return py_trees.common.Status.SUCCESS
         # return py_trees.common.Status.RUNNING
