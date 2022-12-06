@@ -4,7 +4,7 @@ import numpy as np
 from .models import Pose, ControllerModel
 from .models import Planning
 from scipy.signal import convolve2d
-
+from .models import Localization
 
 class Controller(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -17,7 +17,7 @@ class Controller(py_trees.behaviour.Behaviour):
             map = convolve2d(map, kernel, mode='same')
             map[map > 0] = 1
             return map
-
+        
         robotPose = self.r.robot.pose
         randPoint = np.random.randint(0,360,2)
         

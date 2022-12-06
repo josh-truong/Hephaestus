@@ -41,7 +41,7 @@ class Blackboard:
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
 
-        writer.robot.pose = Pose()
+        writer.robot.pose = Pose(5.29, 0.10)
         writer.robot.velocity_rate = 0.6
         writer.robot.vL = 0
         writer.robot.vR = 0

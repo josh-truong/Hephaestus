@@ -28,6 +28,7 @@ class RRT(py_trees.behaviour.Behaviour):
 
         if (not self.r.env.rerun_rrt): return py_trees.common.Status.SUCCESS
         robotPose = self.r.robot.pose
+        print(robotPose)
         randPoint = np.random.randint(0,360,2)
         
         map = convertMapToConfigSpace(self.r.env.map.map)
@@ -35,7 +36,7 @@ class RRT(py_trees.behaviour.Behaviour):
         waypoints = self.planner.getWaypoints(nodes)
         self.w.env.waypoints = waypoints
         self.w.env.state = 0
-        self.w.rerun_rrt = False
+        self.w.env.rerun_rrt = False
 
         self.feedback_message = "Generated RRT"
         self.log_message("update()", self.feedback_message)
