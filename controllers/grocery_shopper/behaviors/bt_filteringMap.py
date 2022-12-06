@@ -42,6 +42,12 @@ class FilteringMap(py_trees.behaviour.Behaviour):
             display.imagePaste(ir, 0, 0, False)
             display.imageDelete(ir)
 
+        def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
+            x = (display[0]*0.5) - (x * (display[0]/world[0]))
+            y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
+            x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
+            return [int(x), int(y)]
+
         self.counter += 1
         self.feedback_message = f"Convolving Map in {self.frequency - self.counter}"
         if (self.counter%self.frequency == 0):
@@ -56,6 +62,12 @@ class FilteringMap(py_trees.behaviour.Behaviour):
             grad[idx] = map[idx]
             grad[idx] = np.clip(grad[idx], 0.0, 1.0)
             redraw_display(grad)
+
+            display = self.r.device.display
+            display.setColor(0x00FF00)
+            for waypoint in self.r.env.waypoints:
+                wx, wy = get_display_coords(waypoint[0],waypoint[1])
+                display.drawPixel(wx, wy)
         self.log_message("update()", self.feedback_message)
         return py_trees.common.Status.SUCCESS
         
