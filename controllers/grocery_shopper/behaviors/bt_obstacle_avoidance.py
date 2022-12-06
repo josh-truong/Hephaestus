@@ -40,6 +40,8 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         lidar_readings = np.array(get_lidar_readings())
         idx = np.argsort(lidar_readings)[:50]
         mean_dist = np.mean(lidar_readings[idx])
+        robotPose = self.r.robot.pose
+        print([robotPose.x, robotPose.y, robotPose.theta])
 
         if (mean_dist < 0.4):
             self.feedback_message = "Obstacle Detected!"

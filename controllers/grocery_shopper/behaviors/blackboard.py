@@ -34,7 +34,7 @@ class Blackboard:
 
         # Setting variables
         # py_trees.logging.level = py_trees.logging.Level.DEBUG
-        writer.debug = False
+        writer.debug = True
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
 
