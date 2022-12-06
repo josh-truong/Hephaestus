@@ -95,45 +95,4 @@ class ControllerModel():
         return vL, vR
 
     def obstacle_avoidance(self, dtol=0.86, sampling=50):
-        # lidar_readings = self.m.Mapping.get_lidar_readings()
-        # n_rays = len(lidar_readings)
-
-        # l_dist, r_dist = lidar_readings[:n_rays//2], lidar_readings[-n_rays//2:]
-        # l_dist.sort(), r_dist.sort()
-        # l_dist, r_dist = np.mean(l_dist[:sampling]), np.mean(r_dist[:sampling])
-
-        # if (l_dist > dtol and r_dist > dtol and not self.avoidance):
-        #     print("Obstacle Detected")
-        #     self.avoidance = True
-        # MS = self.m.rConst.MAX_SPEED
-        
-        
-        # if (self.m.Device.robot_step() != -1):
-            
-        #     vL, vR = (MS*0.2, -MS*0.2) if (l_dist < r_dist) else (-MS*0.2, MS*0.2)
-        #     self.m.Localization.update_odometry(vL, vR, print_pose=False)
-        #     self.m.Device.set_wheel_joint_vel(vL, vR)
-
-
-
-
-        while(self.m.Device.robot_step() != -1):
-            lidar_sensor_readings = self.m.Mapping.get_lidar_readings()
-            n_rays = len(lidar_sensor_readings)
-            
-            lDist = lidar_sensor_readings[:n_rays//2]
-            rDist = lidar_sensor_readings[-n_rays//2:]
-
-            lDist.sort()
-            rDist.sort()
-
-            lDist = np.mean(lDist[:sampling])
-            rDist = np.mean(rDist[:sampling])
-
-            if (lDist > dtol and rDist > dtol):
-                break
-
-            MAX_SPEED = self.m.rConst.MAX_SPEED
-            vL, vR = (MAX_SPEED*0.2, MAX_SPEED*0.1) if (lDist < rDist) else (MAX_SPEED*0.1, MAX_SPEED*0.2)
-            self.m.Device.set_wheel_joint_vel(vL, vR)
-            self.m.Localization.update_odometry()
+        self.r, self.w

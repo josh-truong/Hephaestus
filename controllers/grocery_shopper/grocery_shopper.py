@@ -40,13 +40,56 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
     root.tick_once()
 
     counter+=1
-    if (counter%300==0):
-        fig, ax = plt.subplots()
-        ax.imshow(np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy'))
+    if (counter%100==0):
+        display = reader.device.display
         object_location = np.array(reader.env.object_location)
-        object_location = np.array([get_display_coords(x, y) for x,y,_ in object_location])
-        ax.scatter(object_location[:,0],object_location[:,1],s=2,color='red')
-        plt.pause(3)
-        plt.close()
-    
+
+        display.setColor(0xFFFF00)
+        for x,y,_ in object_location:
+            x, y = get_display_coords(x, y)
+            display.drawRectangle(x-5, y-5, 10,10)
+
+
+    if (counter%1000 == 0):
+        def expand(img_mask, cur_coord):
+            coordinates_in_blob = []
+            coordinate_list = [cur_coord]
+            while len(coordinate_list) > 0:
+                (y, x) = coordinate_list.pop()
+                if y < 0 or x < 0 or y >= img_mask.shape[0] or x >= img_mask.shape[1]:
+                    continue
+                if img_mask[y, x] == 0.0:
+                    continue
+                img_mask[y,x] = 0
+                coordinates_in_blob.append((x,y))
+                coordinate_list.extend([(y-1, x),(y+1, x),(y, x-1),(y, x+1)])
+            return np.asarray(coordinates_in_blob)
+
+        def get_blobs(img_mask):
+            img_mask_height, img_mask_width = img_mask.shape[0], img_mask.shape[1]
+            blobs_list = []
+            img_mask_copy = img_mask.copy()
+            for idx in range(img_mask_height*img_mask_width):
+                y, x = idx // img_mask_width, idx % img_mask_width
+                if (img_mask[y][x] > 0):
+                    blob_coords = expand(img_mask_copy, (y, x))
+                    if (len(blob_coords)):
+                        blobs_list.append(blob_coords)
+            return blobs_list
+
+        blobs = get_blobs(reader.env.map.map)
+        blobs = sorted(blobs, key=len)
+        blob_size = [len(blob) for blob in blobs]
+
+        q25, q75 = np.percentile(blob_size, [25, 75])
+        IQR = q75-q25
+        remove_blobs_idx = np.where(blob_size < IQR)
+        remove_blobs = np.array(blobs)[remove_blobs_idx]
+        for blobs in remove_blobs:
+            for x,y in blobs:
+                writer.env.map.update_pixel(x,y,0)
+
+        print(blob_size)
+        print(q25, q75)
+
 

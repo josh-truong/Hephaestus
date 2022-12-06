@@ -32,7 +32,7 @@ class Blackboard:
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
-        py_trees.logging.level = py_trees.logging.Level.DEBUG
+        # py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = False
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
@@ -47,7 +47,7 @@ class Blackboard:
         writer.robot.ts = 0
 
         writer.env.map = Map()
-        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
+        writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0
