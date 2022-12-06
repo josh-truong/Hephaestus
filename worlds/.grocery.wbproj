@@ -9,5 +9,5 @@ orthographicViewHeight: 23.0893
 textFiles: 0 "controllers/grocery_shopper/grocery_shopper.py"
 globalOptionalRendering: LidarPointClouds::CoordinateSystem
 consoles: Console:All:All
-renderingDevicePerspectives: TIAGo Steel:camera;1;1.60833;0;0
-renderingDevicePerspectives: TIAGo Steel:display;1;0.760493;0.0306675;0.361626
+renderingDevicePerspectives: TIAGo Steel:camera;1;1.17778;0;0
+renderingDevicePerspectives: TIAGo Steel:display;1;0.408333;0.0123485;0.623585
