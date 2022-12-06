@@ -10,8 +10,8 @@ textFiles: -1
 globalOptionalRendering: LidarPointClouds::CoordinateSystem
 consoles: Console:All:All
 renderingDevicePerspectives: TIAGo Steel:MultiSense S21 left camera;0;1;0;0
-renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta camera;1;1;0;0.00346021
-renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta range finder;1;1;0.154188;0.00572748
+renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta camera;1;1.26667;0;0.00346021
+renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta range finder;1;1.5;0.192259;0.00741666
 renderingDevicePerspectives: TIAGo Steel:MultiSense S21 right camera;0;1;0.153553;0
 renderingDevicePerspectives: TIAGo Steel:depth display;0;1.88334;0;0.233105
-renderingDevicePerspectives: TIAGo Steel:display;1;0.401906;0;0.22804
+renderingDevicePerspectives: TIAGo Steel:display;1;0.702778;0;0.31081

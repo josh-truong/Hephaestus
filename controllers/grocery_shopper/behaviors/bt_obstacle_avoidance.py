@@ -36,27 +36,30 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             lidar_sensor_readings = lidar_sensor_readings[83:len(lidar_sensor_readings)-83]
             return lidar_sensor_readings
 
+        
+        lidar_readings = np.array(get_lidar_readings())
+        idx = np.argsort(lidar_readings)[:50]
+        mean_dist = np.mean(lidar_readings[idx])
+
+        if (mean_dist < 0.4):
+            self.feedback_message = "Obstacle Detected!"
+            self.w.env.rerun_rrt = True
+            self.log_message("update()", self.feedback_message)
+            return py_trees.common.Status.SUCCESS
+
         self.counter += 1
         if (self.r.env.check_state):
             self.w.env.check_state = False
-        elif(self.counter%self.frequency == 0):
-            self.w.env.check_state = True
+        # elif(self.counter == 100):
+        #     self.feedback_message = "Obstacle Detected!"
+        #     self.w.env.rerun_rrt = True
+        #     self.log_message("update()", self.feedback_message)
+        #     return py_trees.common.Status.SUCCESS
         else:
             return py_trees.common.Status.SUCCESS
 
 
-        lidar_readings = np.array(get_lidar_readings())
-        idx = np.argsort(lidar_readings)[:50]
-        mean_dist = np.mean(lidar_readings[idx])
-        if (mean_dist <= 1):
-            self.feedback_message = "Obstacle Detected!"
-            # self.w.env.rerun_rrt = True
-
-        print(idx)
-        print(lidar_readings[idx])
-
-
-
+        self.counter = 0
         waypoints = self.r.env.waypoints
         state = self.r.env.state
         state = state if (state == len(waypoints)-1) else state+1
