@@ -1,5 +1,4 @@
 import py_trees
-from .models import Planning
 import numpy as np
 from scipy.signal import convolve2d
 
@@ -14,7 +13,6 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
 
     def setup(self):
         self.log_message("setup()")
-        self.planner = Planning()
         self.counter = 0
         self.frequency = 200
 
