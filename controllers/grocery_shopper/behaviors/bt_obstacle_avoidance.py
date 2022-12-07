@@ -4,6 +4,7 @@ from scipy.signal import convolve2d
 from .models import ConfigSpace
 from .models import DisplayOverlays
 import matplotlib.pyplot as plt
+from .models import ControllerModel
 
 class ObstacleAvoidance(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -20,10 +21,10 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         self.counter = 0
         self.display = DisplayOverlays(self.w, self.r)
         self.config_map = ConfigSpace().run(self.r.env.map.map)
+        self.Driver = ControllerModel(self.w, self.r)
 
     def initialise(self):
         self.log_message("initialise()")
-        self.counter = 0
 
     def update(self):
 
@@ -42,21 +43,31 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             ### ADD STEERING FUNCTION HERE
             left_readings = np.where(lidar_idx < len(lidar_readings)//2)[0]
             right_readings = np.where(lidar_idx > len(lidar_readings)//2)[0]
-            
+            velocity_rate = self.r.robot.velocity_rate
+            speed = self.r.constants.robot.MAX_SPEED*velocity_rate
             if (len(left_readings) > len(right_readings)):
                 self.log_message("update()", "Obstacle Detected on the left!")
-                print("Obstacle Detected on the left!")
+                self.w.robot.vL, self.w.robot.vR = 0.2*speed, -0.2*speed
             else:
                 self.log_message("update()", "Obstacle Detected on the right!")
-                print("Obstacle Detected on the right!")
+                self.w.robot.vL, self.w.robot.vR = -0.2*speed, 0.2*speed
+
+            self.Driver.set_wheel_joint_vel(self.r.robot.vL, self.r.robot.vR)
+            self.Driver.localization.update_odometry()
+
+            # Find the farthest waypoint given a radius
+            waypoints = np.array(self.r.env.waypoints)
+            pose =  self.r.robot.pose
+            pose = np.array([pose.x, pose.y])
+            state = np.argmin(np.linalg.norm(waypoints-pose, axis=1))
+            self.w.env.state = np.clip(state+5, 0, len(waypoints)-1)
+            return py_trees.common.Status.RUNNING
 
         self.log_message("update()", f"Next state check in {self.frequency-self.counter}.")
         self.counter += 1
         if (self.counter%self.frequency == 0):
             self.counter = 0
             self.config_map = ConfigSpace().run(self.r.env.map.map)
-            plt.imshow(self.config_map)
-            plt.show()
 
         waypoints = self.r.env.waypoints
         for i in range(self.r.env.state_step*2):
@@ -64,12 +75,9 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
             x, y = waypoints[i]
             x, y = self.display.get_display_coords(x, y)
             if (self.config_map[y][x] == 1):
-                print("Rerun rrt")
-            print(i, self.config_map[y][x])
-        
+                self.log_message("update()", "Invalid path found! Rerunning RRT.")
+                self.w.env.rerun_rrt = True
         return py_trees.common.Status.SUCCESS
 
-        
-        
     def terminate(self, new_status):
         self.log_message("terminate()", "%s->%s" % (self.status, new_status))
