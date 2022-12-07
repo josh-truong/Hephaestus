@@ -8,6 +8,7 @@ Created on Tues Nov 29 2022
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+from scipy import interpolate
 
 
 class Node:
@@ -170,16 +171,16 @@ class Planning:
                 if goal_point is not None:
                     if np.linalg.norm(newNode.point - goal_point) < 1e-5:
                         return node_list
-
+        print("Path not found.")
         return node_list
 
 
     def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = ((display[0]*0.5) - x) / (display[0]/world[0])
         y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
-        return x,-y
+        return [x,-y]
 
-    def getWaypoints(self, nodes):
+    def getWaypoints(self, nodes, display_coords=False):
         # list of waypoints in map coords, tulpes with (x, y, theta)
         waypoints = []
         goal_node = nodes[-1]
@@ -192,14 +193,35 @@ class Planning:
                 else:
                     waypoints.reverse()
                     waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
+                    waypoints = self.smooth_path(waypoints)
+                    waypoints = [np.linspace(waypoints[i], waypoints[i+1], 10).tolist() for i in range(len(waypoints)-1)]
+                    waypoints = np.array(waypoints).reshape((-1, 2)).tolist()
                     return waypoints
 
-# if __name__ == "__main__":
-#     planner = Planning()
-#     K = 1000 # Feel free to adjust as desired
-#     map = np.load("../assets/filter_map.npy")
+    def smooth_path(self, waypoints):
+        waypoints = np.array(waypoints)
+        x, y = waypoints[:,0], waypoints[:,1]
 
-#     starting_point = [20,200]
-#     goal = np.array([325, 325])
-#     nodes = planner.rrt(starting_point, goal, K, 10, map)
-#     planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
+        # Remove duplicate points
+        okay = np.where(np.abs(np.diff(x)) + np.abs(np.diff(y)) > 0)[0]
+        xn = np.r_[x[okay], x[-1], x[0]]
+        yn = np.r_[y[okay], y[-1], y[0]]
+
+        # create spline function
+        tck, u = interpolate.splprep([xn, yn], s=0, k=3, per=True)
+
+        #create interpolated lists of points
+        xn, yn = interpolate.splev(np.linspace(0, 1, 20), tck)
+        return list(zip(xn, yn))
+
+
+if __name__ == "__main__":
+    planner = Planning()
+    K = 1000 # Feel free to adjust as desired
+    map = np.load("../../assets/filter_map.npy")
+
+    starting_point = [20,200]
+    goal = np.array([325, 325])
+    nodes = planner.rrt(starting_point, goal, K, 10, map)
+    planner.getWaypoints(nodes)
+    # planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
