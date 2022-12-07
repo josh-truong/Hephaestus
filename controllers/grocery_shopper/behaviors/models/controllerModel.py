@@ -83,6 +83,7 @@ class ControllerModel():
             if (state == len(waypoints)-1):
                 self.w.env.num_completed_paths += 1
                 self.w.env.rerun_rrt = True
+                self.w.env.vaiable_waypoints.append([goal.x, goal.y])
             state += self.r.env.state_step if (state != len(waypoints)-1) else 0
             state = np.clip(state, 0, len(waypoints)-1)
             self.w.env.state = state
