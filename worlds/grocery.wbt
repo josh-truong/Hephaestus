@@ -114,19 +114,6 @@ Solid {
   ]
 }
 Solid {
-  translation 3.4886 -0.10874 2.08
-  children [
-    PipeBoundingObject {
-      height 7
-      radius 0.25
-    }
-  ]
-  name "beacon8"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
   translation 10.7586 4.00126 2.08
   children [
     PipeBoundingObject {
@@ -1294,10 +1281,6 @@ TiagoSteel {
     GPS {
     }
     HokuyoUrg04lxug01 {
-    }
-    HokuyoUrg04lxug01 {
-      translation 0 0 1.07
-      name "Hokuyo URG-04LX-UG01 Object Depth"
     }
   ]
 }
