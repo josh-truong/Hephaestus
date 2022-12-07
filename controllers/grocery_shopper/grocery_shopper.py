@@ -53,11 +53,7 @@ path_planning.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=write
 path_planning.add_child(RRT(name="Running RRT", writer=writer, reader=reader))
 
 
-def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
-    x = (display[0]*0.5) - (x * (display[0]/world[0]))
-    y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
-    x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
-    return [int(x), int(y)]
+
 
 # Main Loop
 while robot.step(int(robot.getBasicTimeStep())) != -1:
