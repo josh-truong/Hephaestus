@@ -16,7 +16,7 @@ class CameraBounds(py_trees.behaviour.Behaviour):
 
     def setup(self):
         self.log_message("setup()")
-        self.camera_frequency = self.r.env.refresh_hz*2
+        self.camera_frequency = self.r.env.refresh_hz*1
         self.camera_counter = 0
         self.detection = EdgeDetection(self.w, self.r)
         self.display = DisplayOverlays(self.w, self.r)
@@ -49,6 +49,7 @@ class CameraBounds(py_trees.behaviour.Behaviour):
             object_blobs = self.detection.return_blobs(img_mask)
             object_bounds = self.detection.return_bounds(blobs)
             self.display.draw_object_bounds(self.r.device.depth_display, object_bounds)
+            self.display.draw_estimated_location_on_map()
 
             # Estimate object position
             for i, centroid in enumerate(centroids):
