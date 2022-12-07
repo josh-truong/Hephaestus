@@ -2,6 +2,7 @@ import py_trees
 from .models import Planning
 import numpy as np
 from .models import ConfigSpace
+from .models import DisplayOverlays
 
 class RRT(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -15,6 +16,7 @@ class RRT(py_trees.behaviour.Behaviour):
     def setup(self):
         self.log_message("setup()")
         self.planner = Planning()
+        self.display = DisplayOverlays(self.w, self.r)
 
     def initialise(self):
         # self.log_message("initialise()")
@@ -22,26 +24,21 @@ class RRT(py_trees.behaviour.Behaviour):
 
     def update(self):
         if (not self.r.env.rerun_rrt): return py_trees.common.Status.SUCCESS
-        print("Rerunning RRT")
-        robotPose = self.r.robot.pose
-        def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
-            x = (display[0]*0.5) - (x * (display[0]/world[0]))
-            y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
-            x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
-            return [int(x), int(y)]
-        x, y = get_display_coords(robotPose.x, -1 * robotPose.y)
+        self.w.env.rerun_rrt = False
+
+        pose = self.r.robot.pose
+        x, y = self.display.get_display_coords(pose.x, -pose.y)
 
         map = ConfigSpace().run(self.r.env.map.map)
         nodes = self.planner.rrt([x, y], np.random.randint(0,360,2), 1000, 10, map)
         waypoints = self.planner.getWaypoints(nodes)
+
         self.w.env.waypoints = waypoints
         self.w.env.state = 0
-        self.w.env.rerun_rrt = False
 
-        self.feedback_message = "Generated RRT"
+        self.feedback_message = f"Generated {len(waypoints)} waypoints."
         self.log_message("update()", self.feedback_message)
         return py_trees.common.Status.SUCCESS
-        # return py_trees.common.Status.RUNNING
         
     def terminate(self, new_status):
         self.log_message("terminate()", "%s->%s" % (self.status, new_status))
