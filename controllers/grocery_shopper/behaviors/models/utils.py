@@ -30,25 +30,3 @@ class Map:
     
     def update_map(self, map):
         self.map = map.astype('float64')
-
-    def save(self, filename="map.npy"):
-        np.save("assets/" + filename, self.map)
-        print("Map file saved.")
-
-    def load(self, filename="map.npy"):
-        self.map = np.load("assets/" + filename, allow_pickle=True)
-        print("Map file loaded.")
-        return self.map
-    
-    def filter(self, map=None, tol=0.5, filename="filter_map.npy"):
-        map = self.map if (map is None) else map
-        map = (map >= tol).astype(int)
-        np.save("assets/" + filename, map)
-        print("Filter map file saved.")
-        return map
-    
-    def display(self, map=None):
-        map = self.map if (map is None) else map
-        plt.imshow(map)
-        plt.colorbar()
-        plt.show()
