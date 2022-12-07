@@ -23,7 +23,7 @@ class Blackboard:
             "device/range_finder", "device/depth_display", "device/disable_lidar",
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
             "env/goal", "env/object_location", "env/rerun_rrt", "env/state_step",
-            "env/num_completed_paths", "env/behavior_state",
+            "env/num_completed_paths", "env/behavior_state", "env/vaiable_waypoints",
             "ik/rtol", "ik/atol", "ik/etol", "ik/p1", "ik/p2", "ik/p3",
             "robot/pose","robot/robot", "robot/parts", "robot/vL", "robot/vR", 
             "robot/velocity_rate", "robot/ts", "robot/reverse"
@@ -49,16 +49,17 @@ class Blackboard:
         writer.robot.reverse = False
 
         writer.env.map = Map()
+        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
         writer.env.behavior_state = 0
         writer.env.rerun_rrt = True
         writer.env.num_completed_paths = 0
-        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0
         writer.env.state_step = 15
         writer.env.goal = None
         writer.env.waypoints = None
+        writer.env.vaiable_waypoints = []
         # writer.env.waypoints = [
         #     (  4.80,  0.00,  0.00),
         #     (  4.79, -2.22,  0.00),
