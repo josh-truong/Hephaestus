@@ -87,6 +87,3 @@ class Localization:
         pose.y -= (vL+vR)/2/MAX_SPEED*MAX_SPEED_MS*ts/1000.0*math.sin(pose.theta)
         pose.theta += (vR-vL)/AXLE_LENGTH/MAX_SPEED*MAX_SPEED_MS*ts/1000.0
         self.w.robot.pose = pose
-
-        if (self.r.debug):
-            print(f"X: {pose.x:.2f} Z: {pose.y:.2f} Theta: {pose.theta:2f}")
