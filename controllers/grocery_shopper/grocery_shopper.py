@@ -45,7 +45,7 @@ autonomous_mapping.add_child(ObstacleAvoidance(name="Avoiding Obstacle", writer=
 autonomous_mapping.add_child(RRT(name="RRT", writer=writer, reader=reader))
 autonomous_mapping.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
 autonomous_mapping.add_child(FilteringMap(name="Filtering Controller", writer=writer, reader=reader))
-# autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
+autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
 autonomous_mapping.setup_with_descendants()
 
 path_planning = py_trees.composites.Sequence("Sequence")
@@ -59,25 +59,16 @@ def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
     x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
     return [int(x), int(y)]
 
-counter = 0
 # Main Loop
 while robot.step(int(robot.getBasicTimeStep())) != -1:
     if (reader.env.behavior_state == 0):
+        if (writer.env.num_completed_paths == 10): writer.env.behavior_state = 1
         autonomous_mapping.tick_once()
     elif (reader.env.behavior_state == 1):
         path_planning.tick_once()
     else:
         pass
 
-    counter+=1
-    if (counter%100==0):
-        display = reader.device.display
-        object_location = np.array(reader.env.object_location)
-
-        display.setColor(0xFFFF00)
-        for x,y,_ in object_location:
-            x, y = get_display_coords(x, y)
-            display.drawRectangle(x-5, y-5, 10,10)
 
 
     # if (counter%1000 == 0):
