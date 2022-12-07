@@ -56,7 +56,6 @@ class Vision:
             for i in range(len(bgr_tuple)):
                 if bgr_tuple[i] < lower[i] or bgr_tuple[i] > upper[i]:
                     in_range = False
-                    #print(bgr_tuple)
                     break
             if in_range: return True
         return False
