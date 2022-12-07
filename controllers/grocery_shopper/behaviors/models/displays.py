@@ -64,3 +64,21 @@ class DisplayOverlays:
         for x,y,_ in object_location:
             x, y = self.get_display_coords(x, y)
             display.drawRectangle(x-5, y-5, 10,10)
+    
+    def redraw_display(self, map):
+        width, height = map.shape
+        map = [(map.T*255).astype(int).tolist()]*3
+
+        # Reload new map
+        display = self.r.device.display
+        ir = display.imageNew(map, display.RGB, width, height)
+        display.imagePaste(ir, 0, 0, False)
+        display.imageDelete(ir)
+
+    def draw_waypoints(self):
+        # Draw waypoints on display as green path
+        display = self.r.device.display
+        display.setColor(0x00FF00)
+        for waypoint in self.r.env.waypoints:
+            wx, wy = self.get_display_coords(waypoint[0],waypoint[1])
+            display.drawPixel(wx, wy)
