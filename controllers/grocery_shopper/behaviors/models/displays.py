@@ -55,3 +55,12 @@ class DisplayOverlays:
             display.drawPixel(x, y)
 
         self.w.env.map = map
+
+    def draw_estimated_location_on_map(self):
+        display = self.r.device.display
+        object_location = np.array(self.r.env.object_location)
+
+        display.setColor(0xFFFF00)
+        for x,y,_ in object_location:
+            x, y = self.get_display_coords(x, y)
+            display.drawRectangle(x-5, y-5, 10,10)
