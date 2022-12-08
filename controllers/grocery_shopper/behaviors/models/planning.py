@@ -147,9 +147,6 @@ class Planning:
         :param delta_q: Maximum distance allowed between vertices
         :returns List of RRT graph nodes
         '''
-        plt.imshow(map)
-        plt.pause(0.01)
-
         
         node_list = []
         node_list.append(Node(starting_point, parent=None)) # Add Node at starting point with no parent
@@ -196,13 +193,18 @@ class Planning:
                     cur_node = cur_node.parent
                 else:
                     waypoints.reverse()
-                    # print(waypoints[0], waypoints[-1])
-                    waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
-                    # try:
-                    #     waypoints = self.smooth_path(waypoints)[:-1]
-                    #     return waypoints
-                    # except:
-                    #     return waypoints
+                    try:
+                        waypoints = self.smooth_path(waypoints)[:-1]
+                        new_waypoints = []
+                        for i in range(len(waypoints)-1):
+                            start, end = waypoints[i], waypoints[i+1]
+                            num_pixels_between = abs(start[0]-end[0])+abs(start[1]-end[1])
+                            new_waypoints.extend(np.linspace(start, end, int(num_pixels_between)))
+                        waypoints = [self.get_world_coords(x, y) for x,y in new_waypoints]
+                        return waypoints
+                    except:
+                        waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
+                        return waypoints
                     return waypoints
 
     def smooth_path(self, waypoints):
