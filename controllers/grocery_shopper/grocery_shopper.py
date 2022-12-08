@@ -4,6 +4,7 @@ import numpy as np
 import py_trees
 import matplotlib.pyplot as plt
 
+from behaviors.models import DisplayOverlays
 from behaviors.models import Localization
 from behaviors.models import Planning
 from behaviors.models import ConfigSpace
@@ -11,13 +12,12 @@ from behaviors import Blackboard
 from behaviors import Controller
 from behaviors import Mapping
 from behaviors import FilteringMap
+from behaviors import LineDetection
 from behaviors import MapBounds
 from behaviors import CameraBounds
 from behaviors import ObstacleAvoidance
 from behaviors import Planning
 from behaviors import RRT
-from behaviors import Reverse
-
 
 blackboard = Blackboard()
 writer, reader = blackboard.get()
@@ -30,8 +30,10 @@ robot.step(int(robot.getBasicTimeStep()))
 writer.robot.pose = Localization(writer, reader).get_pose()
 pose = reader.robot.pose
 planning = Planning()
+
+x, y = DisplayOverlays(writer, reader).get_display_coords(pose.x, pose.y)
 nodes = planning.rrt(
-    starting_point=(pose.x, pose.y), 
+    starting_point=(x, y), 
     goal_point=np.random.randint(0,360,2), 
     k=1000, 
     delta_q=10, 
@@ -40,25 +42,25 @@ writer.env.waypoints = planning.getWaypoints(nodes)
 
 autonomous_mapping = py_trees.composites.Sequence("Sequence")
 autonomous_mapping.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
-# autonomous_mapping.add_child(Controller(name="Reverse Robot", writer=writer, reader=reader))
 autonomous_mapping.add_child(ObstacleAvoidance(name="Avoiding Obstacle", writer=writer, reader=reader))
 autonomous_mapping.add_child(RRT(name="RRT", writer=writer, reader=reader))
 autonomous_mapping.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
 autonomous_mapping.add_child(FilteringMap(name="Filtering Controller", writer=writer, reader=reader))
-autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
+# autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
 autonomous_mapping.setup_with_descendants()
 
-path_planning = py_trees.composites.Sequence("Sequence")
-path_planning.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=writer, reader=reader))
-path_planning.add_child(RRT(name="Running RRT", writer=writer, reader=reader))
+# path_planning = py_trees.composites.Sequence("Sequence")
+# path_planning.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=writer, reader=reader))
+# autonomous_mapping.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
+# path_planning.add_child(RRT(name="Running RRT", writer=writer, reader=reader))
 
 
 
-
+counter = 0
 # Main Loop
 while robot.step(int(robot.getBasicTimeStep())) != -1:
     if (reader.env.behavior_state == 0):
-        if (writer.env.num_completed_paths == 10): writer.env.behavior_state = 1
+        if (reader.env.num_completed_paths == reader.env.max_completed_paths): writer.env.behavior_state = 1
         autonomous_mapping.tick_once()
     elif (reader.env.behavior_state == 1):
         path_planning.tick_once()
@@ -66,7 +68,7 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
         pass
 
 
-
+    # counter += 1
     # if (counter%1000 == 0):
     #     def expand(img_mask, cur_coord):
     #         coordinates_in_blob = []
@@ -98,13 +100,8 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
     #     blobs = sorted(blobs, key=len)
     #     blob_size = [len(blob) for blob in blobs]
 
-    #     q25, q75 = np.percentile(blob_size, [25, 75])
-    #     IQR = q75-q25
-    #     remove_blobs_idx = np.where(blob_size < IQR)
+    #     remove_blobs_idx = np.where(blob_size < np.min(blob_size))
     #     remove_blobs = np.array(blobs)[remove_blobs_idx]
     #     for blobs in remove_blobs:
     #         for x,y in blobs:
     #             writer.env.map.update_pixel(x,y,0)
-
-    #     print(blob_size)
-    #     print(q25, q75)
