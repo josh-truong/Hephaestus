@@ -3,7 +3,7 @@ from scipy.signal import convolve2d
 import matplotlib.pyplot as plt
 
 class ConfigSpace:
-    def __init__(self, kernel_size=(10,10)):
+    def __init__(self, kernel_size=(5,5)):
         self.kernel = np.ones(kernel_size)
         self.horizontal_mask = np.array([
             [-1, -1, -1],
