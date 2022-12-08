@@ -149,6 +149,8 @@ class Planning:
         '''
         plt.imshow(map)
         plt.pause(0.01)
+
+        
         node_list = []
         node_list.append(Node(starting_point, parent=None)) # Add Node at starting point with no parent
         # TODO: Your code here
@@ -173,8 +175,8 @@ class Planning:
                 if goal_point is not None:
                     if np.linalg.norm(newNode.point - goal_point) < 1e-5:
                         return node_list
-        print("Path not found.")
-        return node_list
+        print(f"RRT could not find path from {starting_point} to {goal_point}.")
+        return [starting_point]
 
 
     def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
