@@ -29,6 +29,44 @@ class Controller(py_trees.behaviour.Behaviour):
         keyboard = self.r.device.keyboard
         key = keyboard.getKey()
         while(keyboard.getKey() != -1): pass
+        if (key == ord('R')):
+            self.w.env.rerun_rrt = True
+        elif (key == ord('F')):
+            def expand(img_mask, cur_coord):
+                coordinates_in_blob = []
+                coordinate_list = [cur_coord]
+                while len(coordinate_list) > 0:
+                    (y, x) = coordinate_list.pop()
+                    if y < 0 or x < 0 or y >= img_mask.shape[0] or x >= img_mask.shape[1]:
+                        continue
+                    if img_mask[y, x] == 0.0:
+                        continue
+                    img_mask[y,x] = 0
+                    coordinates_in_blob.append([x,y])
+                    coordinate_list.extend([(y-1, x),(y+1, x),(y, x-1),(y, x+1)])
+                return np.asarray(coordinates_in_blob)
+
+            def get_blobs(img_mask):
+                img_mask_height, img_mask_width = img_mask.shape[0], img_mask.shape[1]
+                blobs_list, blobs_size = [], []
+                img_mask_copy = img_mask.copy()
+                for idx in range(img_mask_height*img_mask_width):
+                    y, x = idx // img_mask_width, idx % img_mask_width
+                    if (img_mask[y][x] > 0):
+                        blob_coords = expand(img_mask_copy, [y, x])
+                        if (len(blob_coords)):
+                            blobs_list.append(blob_coords)
+                            blobs_size.append(len(blob_coords))
+                return np.array(blobs_list), np.array(blobs_size)
+            
+            blobs_list, blobs_size = get_blobs(self.r.env.map.map.copy())
+            outlier_idx = np.where(blobs_size < 30)
+            outliers = blobs_list[outlier_idx]
+            if (outliers != []):
+                for x, y in np.vstack(outliers):
+                    self.w.env.map.update_pixel(x,y,0)
+        elif (key == ord('Q')):
+            self.w.env.behavior_state += 1
 
         vL, vR = 0, 0
         controller_type = self.r.controller_type
