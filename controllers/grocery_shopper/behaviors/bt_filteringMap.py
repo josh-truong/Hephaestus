@@ -17,7 +17,7 @@ class FilteringMap(py_trees.behaviour.Behaviour):
         # self.log_message("setup()")
         
         self.counter = 0
-        self.frequency = self.r.env.refresh_hz*1
+        self.frequency = self.r.env.refresh_hz*2
         self.display = DisplayOverlays(self.w, self.r)
         self.configSpace = ConfigSpace()
 
