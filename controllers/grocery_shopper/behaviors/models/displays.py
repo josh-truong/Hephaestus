@@ -5,7 +5,7 @@ class DisplayOverlays:
     def __init__(self, writer, reader):
         self.w, self.r = writer, reader
 
-    def get_display_coords(self, x, y, display=(360, 360), world=(30, 15)):
+    def get_display_coords(self, x, y, display=(360, 360), world=(30, 16)):
         x = (display[0]*0.5) - (x * (display[0]/world[0]))
         y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
         x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
@@ -67,8 +67,8 @@ class DisplayOverlays:
     
     def redraw_display(self, map):
         width, height = map.shape
-        map = [(map.T*255).astype(int).tolist()]*3
-
+        map = map.T*255
+        map = np.dstack([map, map, map]).tolist()
         # Reload new map
         display = self.r.device.display
         ir = display.imageNew(map, display.RGB, width, height)
