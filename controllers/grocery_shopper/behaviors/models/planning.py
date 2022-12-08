@@ -176,7 +176,7 @@ class Planning:
                     if np.linalg.norm(newNode.point - goal_point) < 1e-5:
                         return node_list
         print(f"RRT could not find path from {starting_point} to {goal_point}.")
-        return [starting_point]
+        return node_list
 
 
     def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
