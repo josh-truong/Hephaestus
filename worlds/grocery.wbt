@@ -21,8 +21,8 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position -4.380564709031139 -0.31787560034643547 10.416648904592353
-  follow "TIAGo Steel:plastic crate"
+  position -8.459552579697599 0.029523681527228975 96.13093569753474
+  follow "floor"
 }
 TexturedBackground {
   texture "empty_office"
