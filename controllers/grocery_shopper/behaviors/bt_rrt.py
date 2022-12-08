@@ -38,6 +38,10 @@ class RRT(py_trees.behaviour.Behaviour):
         # to_point = np.array([np.random.randint(0,xbound), np.random.randint(0,ybound)])
         to_point = np.random.randint(0,360, 2)
         nodes = self.planner.rrt([x, y], to_point, 1000, 10, map)
+        if (not nodes):
+            self.w.env.rerun_rrt = True
+            self.w.robot.msg = "EXCEPTION CAUGHT FOR RRT!"
+            return py_trees.common.Status.SUCCESS
 
         # nodes = self.planner.rrt([x, y], np.random.randint(0,360,2), 1000, 10, map)
         waypoints = self.planner.getWaypoints(nodes)
