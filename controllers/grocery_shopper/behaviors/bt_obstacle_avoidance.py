@@ -41,19 +41,21 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         pass
 
     def update(self):
-        ######################################
-        # Continously check a subset of waypoints to determine if path is still valid
-        waypoints = self.r.env.waypoints
-        n = len(waypoints)
-        state, state_step = self.r.env.state, self.r.env.state_step
-        endstate = np.clip(state+state_step*3, 0, n-1)
+        # ######################################
+        # # Continously check a subset of waypoints to determine if path is still valid
+        # waypoints = self.r.env.waypoints
+        # n = len(waypoints)
+        # state, state_step = self.r.env.state, self.r.env.state_step
+        # endstate = np.clip(state+state_step*5, 0, n-1)
 
-        waypoints = [self.display.get_display_coords(pt[0], pt[1]) for pt in waypoints[state:endstate]]
-        waypoints = np.array(waypoints)
-        map = np.array(self.r.env.map.map)[waypoints]
-        if (len(np.where(map == 1)[0])):
-            self.w.env.rerun_rrt = self.switch
-            self.w.robot.msg = "Path conflict."
+        # waypoints = [self.display.get_display_coords(pt[0], pt[1]) for pt in waypoints[state:endstate]]
+        # map = np.array(self.r.env.map.map)[np.array(waypoints)]
+        # if (len(np.where(map == 1)[0]) > 0):
+        #     self.w.env.rerun_rrt = True
+        #     self.w.robot.msg = "Path conflict."
+        #     self.w.env.waypoints = self.r.env.waypoints[np.clip(self.r.env.state-15, 0, n)]
+        #     self.w.env.state = 0
+        #     return py_trees.common.Status.SUCCESS
 
         ######################################
         # Continously check the distance of the robot to avoid obstacle collision
