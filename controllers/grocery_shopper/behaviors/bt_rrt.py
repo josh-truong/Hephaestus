@@ -33,9 +33,10 @@ class RRT(py_trees.behaviour.Behaviour):
         map = ConfigSpace().run(self.r.env.map.map)
 
         from_point = np.array([x, y])
-        xbound = self.w.env.xmax_boundary
-        ybound = self.w.env.ymax_boundary
-        to_point = np.array([np.random.randint(0,xbound), np.random.randint(0,ybound)])
+        # xbound = self.w.env.xmax_boundary
+        # ybound = self.w.env.ymax_boundary
+        # to_point = np.array([np.random.randint(0,xbound), np.random.randint(0,ybound)])
+        to_point = np.random.randint(0,360, 2)
         nodes = self.planner.rrt([x, y], to_point, 1000, 10, map)
 
         # nodes = self.planner.rrt([x, y], np.random.randint(0,360,2), 1000, 10, map)
