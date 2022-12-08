@@ -3,7 +3,7 @@ from scipy.signal import convolve2d
 import matplotlib.pyplot as plt
 
 class ConfigSpace:
-    def __init__(self, kernel_size=(3,3)):
+    def __init__(self, kernel_size=(10,10)):
         self.kernel = np.ones(kernel_size)
         self.horizontal_mask = np.array([
             [-1, -1, -1],
@@ -17,11 +17,10 @@ class ConfigSpace:
         ])
 
     def run(self, map):
-        # map[map > 0.5] = 1
-        # map[map < 0.5] = 0
-        map = self.filter_by_convolving(map,0.5)
+        q25 = np.percentile(map, 25)
+        map = self.filter_by_convolving(map,q25)
         map = convolve2d(map, self.kernel, mode='same')
-        map[map > np.percentile(map, 25)] = 1
+        map[map > np.subtract(*np.percentile(map, [75, 25]))] = 1
         return map
 
     def filter_by_convolving(self, map, ftol):
