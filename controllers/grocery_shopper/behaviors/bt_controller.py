@@ -9,7 +9,7 @@ from .models import Localization
 class Controller(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
         super(Controller, self).__init__(name)
-        self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
+        # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
 
         
@@ -17,7 +17,7 @@ class Controller(py_trees.behaviour.Behaviour):
         self.logger.debug("%s [%s::%s][%s]" % (self.name, function_name, self.__class__.__name__, feedback_message))
 
     def setup(self):
-        self.log_message("setup()")
+        # self.log_message("setup()")
         self.Driver = ControllerModel(self.w, self.r)
 
 
@@ -39,15 +39,13 @@ class Controller(py_trees.behaviour.Behaviour):
         elif (controller_type == 'autonomous'):
             vL, vR = self.Driver.autonomous(velocity_rate)
 
-
         self.w.device.disable_lidar = (np.sign(vL) != np.sign(vR))
 
         self.w.robot.vL, self.w.robot.vR = vL, vR
         self.Driver.set_wheel_joint_vel(vL, vR)
         self.Driver.localization.update_odometry()
 
-        self.feedback_message = f"Left wheel velocity: {vL:.2f} Right wheel velocity: {vR:.2f}"
-        self.log_message("update()", self.feedback_message)
+        self.log_message("update()", f"Completed paths: {self.r.env.num_completed_paths} out of {self.r.env.max_completed_paths}. Current map bound: [{self.w.env.xmax_boundary}, {self.w.env.ymax_boundary}].")
         return py_trees.common.Status.SUCCESS
         
     def terminate(self, new_status):

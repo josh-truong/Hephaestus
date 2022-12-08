@@ -7,17 +7,17 @@ from .models import ConfigSpace
 class FilteringMap(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
         super(FilteringMap, self).__init__(name)
-        self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
+        # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
 
     def log_message(self, function_name: str, feedback_message=""):
         self.logger.debug("%s [%s::%s][%s]" % (self.name, function_name, self.__class__.__name__, feedback_message))
 
     def setup(self):
-        self.log_message("setup()")
+        # self.log_message("setup()")
         
         self.counter = 0
-        self.frequency = self.r.env.refresh_hz
+        self.frequency = self.r.env.refresh_hz*1
         self.display = DisplayOverlays(self.w, self.r)
         self.configSpace = ConfigSpace()
 
@@ -29,11 +29,11 @@ class FilteringMap(py_trees.behaviour.Behaviour):
         self.counter += 1
         self.feedback_message = f"Convolving Map in {self.frequency - self.counter}"
         if (self.counter%self.frequency == 0):
-            self.feedback_message = "Convolving Map"
+            self.w.robot.msg = "Denoising map."
             self.counter = 0
 
             map = self.configSpace.filter_by_convolving(self.r.env.map.map, self.r.env.ftol)
-            self.w.env.map.update_map(map)
+            self.w.env.map.map = map
             self.display.redraw_display(map)
             self.display.draw_waypoints()
             
