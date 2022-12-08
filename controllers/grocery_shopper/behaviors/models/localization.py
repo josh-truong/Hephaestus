@@ -81,7 +81,9 @@ class Localization:
         MAX_SPEED_MS = self.r.constants.robot.MAX_SPEED_MS
         AXLE_LENGTH  = self.r.constants.robot.AXLE_LENGTH
 
-        vL, vR = self.r.robot.vL, self.r.robot.vR
+        vL = self.w.robot.parts["wheel_left_joint"].getVelocity()
+        vR = self.w.robot.parts["wheel_right_joint"].getVelocity()
+
         pose = self.get_pose()
         pose.x -= (vL+vR)/2/MAX_SPEED*MAX_SPEED_MS*ts/1000.0*math.cos(pose.theta)
         pose.y -= (vL+vR)/2/MAX_SPEED*MAX_SPEED_MS*ts/1000.0*math.sin(pose.theta)
