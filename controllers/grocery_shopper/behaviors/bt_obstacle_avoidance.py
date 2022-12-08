@@ -6,18 +6,13 @@ from .models import DisplayOverlays
 import matplotlib.pyplot as plt
 from .models import ControllerModel
 from .models import Localization
-
-from .bt_rrt import RRT
+from .models import Planning
 
 class ObstacleAvoidance(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
         super(ObstacleAvoidance, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
-        # self.reverse_behavior = py_trees.composites.Sequence("Reverse Sequence")
-        # self.reverse_behavior.add_child(Reverse("Reversing", self.w, self.r))
-        # self.reverse_behavior.add_child(RRT("RRT for reverse", self.w, self.r))
-        # self.reverse_behavior.setup_with_descendants()
 
     def log_message(self, function_name: str, feedback_message=""):
         self.logger.debug("%s [%s::%s][%s]" % (self.name, function_name, self.__class__.__name__, feedback_message))
@@ -42,20 +37,22 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
 
     def update(self):
         # ######################################
-        # # Continously check a subset of waypoints to determine if path is still valid
-        # waypoints = self.r.env.waypoints
-        # n = len(waypoints)
-        # state, state_step = self.r.env.state, self.r.env.state_step
-        # endstate = np.clip(state+state_step*5, 0, n-1)
+        # Continously check a subset of waypoints to determine if path is still valid
+        waypoints = self.r.env.waypoints
+        n = len(waypoints)
+        state, state_step = self.r.env.state, self.r.env.state_step
+        # endstate = np.clip(state+state_step*1, 0, n-1)
+        endstate = np.clip(state, 0, n-1)
 
-        # waypoints = [self.display.get_display_coords(pt[0], pt[1]) for pt in waypoints[state:endstate]]
-        # map = np.array(self.r.env.map.map)[np.array(waypoints)]
-        # if (len(np.where(map == 1)[0]) > 0):
-        #     self.w.env.rerun_rrt = True
-        #     self.w.robot.msg = "Path conflict."
-        #     self.w.env.waypoints = self.r.env.waypoints[np.clip(self.r.env.state-15, 0, n)]
-        #     self.w.env.state = 0
-        #     return py_trees.common.Status.SUCCESS
+        waypoints = [self.display.get_display_coords(pt[0], pt[1]) for pt in waypoints[state:endstate]]
+        if (waypoints != []):
+            map = np.array(self.r.env.map.map)[np.array(waypoints)]
+            if (len(np.where(map == 1)[0]) > 0):
+                self.w.env.rerun_rrt = True
+                self.w.robot.msg = "Path conflict."
+                self.w.env.waypoints = []
+                self.w.env.state = 0
+                return py_trees.common.Status.SUCCESS
 
         ######################################
         # Continously check the distance of the robot to avoid obstacle collision
