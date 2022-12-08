@@ -147,6 +147,8 @@ class Planning:
         :param delta_q: Maximum distance allowed between vertices
         :returns List of RRT graph nodes
         '''
+        plt.imshow(map)
+        plt.pause(0.01)
         node_list = []
         node_list.append(Node(starting_point, parent=None)) # Add Node at starting point with no parent
         # TODO: Your code here
@@ -192,13 +194,17 @@ class Planning:
                     cur_node = cur_node.parent
                 else:
                     waypoints.reverse()
+                    # print(waypoints[0], waypoints[-1])
                     waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
-                    waypoints = self.smooth_path(waypoints)
-                    waypoints = [np.linspace(waypoints[i], waypoints[i+1], 10).tolist() for i in range(len(waypoints)-1)]
-                    waypoints = np.array(waypoints).reshape((-1, 2)).tolist()
+                    # try:
+                    #     waypoints = self.smooth_path(waypoints)[:-1]
+                    #     return waypoints
+                    # except:
+                    #     return waypoints
                     return waypoints
 
     def smooth_path(self, waypoints):
+        if (waypoints is None): return []
         waypoints = np.array(waypoints)
         x, y = waypoints[:,0], waypoints[:,1]
 
@@ -215,13 +221,13 @@ class Planning:
         return list(zip(xn, yn))
 
 
-if __name__ == "__main__":
-    planner = Planning()
-    K = 1000 # Feel free to adjust as desired
-    map = np.load("../../assets/filter_map.npy")
+# if __name__ == "__main__":
+#     planner = Planning()
+#     K = 1000 # Feel free to adjust as desired
+#     map = np.load("../../assets/filter_map.npy")
 
-    starting_point = [20,200]
-    goal = np.array([325, 325])
-    nodes = planner.rrt(starting_point, goal, K, 10, map)
-    planner.getWaypoints(nodes)
-    # planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
+#     starting_point = [20,200]
+#     goal = np.array([325, 325])
+#     nodes = planner.rrt(starting_point, goal, K, 10, map)
+#     planner.getWaypoints(nodes)
+#     # planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
