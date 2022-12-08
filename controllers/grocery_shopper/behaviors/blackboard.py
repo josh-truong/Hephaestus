@@ -53,8 +53,8 @@ class Blackboard:
         writer.env.map = Map()
         # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\filter_map.npy')
         writer.env.behavior_state = 0
-        writer.env.xmax_boundary = 100
-        writer.env.ymax_boundary = 100
+        writer.env.xmax_boundary = 360
+        writer.env.ymax_boundary = 360
         writer.env.rerun_rrt = True
         writer.env.num_completed_paths = 0
         writer.env.max_completed_paths = 100
