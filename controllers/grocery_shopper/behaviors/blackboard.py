@@ -35,7 +35,7 @@ class Blackboard:
 
         # Setting variables
         # py_trees.logging.level = py_trees.logging.Level.DEBUG
-        writer.debug = True
+        writer.debug = False
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
 
@@ -62,7 +62,6 @@ class Blackboard:
         writer.env.ftol = 1
         writer.env.state = 0
         writer.env.state_step = 15
-        # writer.env.state_step = 1
         writer.env.goal = None
         writer.env.waypoints = None
         writer.env.vaiable_waypoints = []
