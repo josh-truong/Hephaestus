@@ -49,6 +49,8 @@ path_planning = py_trees.composites.Sequence("Sequence")
 path_planning.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=writer, reader=reader))
 path_planning.add_child(RRT(name="Running RRT", writer=writer, reader=reader))
 
+block_collection = py_trees.composites.Sequence("Sequence")
+block_collection.setup_with_descendants()
 
 def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
     x = (display[0]*0.5) - (x * (display[0]/world[0]))
@@ -59,22 +61,22 @@ def get_display_coords(x, y, display=(360, 360), world=(30, 15)):
 counter = 0
 # Main Loop
 while robot.step(int(robot.getBasicTimeStep())) != -1:
-    if (reader.env.behavior_state == 0):
-        autonomous_mapping.tick_once()
-    elif (reader.env.behavior_state == 1):
-        path_planning.tick_once()
-    else:
-        pass
+    # if (reader.env.behavior_state == 0):
+    #     autonomous_mapping.tick_once()
+    # elif (reader.env.behavior_state == 1):
+    #     path_planning.tick_once()
+    # else:
+    block_collection.tick_once()
 
-    counter+=1
-    if (counter%100==0):
-        display = reader.device.display
-        object_location = np.array(reader.env.object_location)
+    # counter+=1
+    # if (counter%100==0):
+    #     display = reader.device.display
+    #     object_location = np.array(reader.env.object_location)
 
-        display.setColor(0xFFFF00)
-        for x,y,_ in object_location:
-            x, y = get_display_coords(x, y)
-            display.drawRectangle(x-5, y-5, 10,10)
+    #     display.setColor(0xFFFF00)
+    #     for x,y,_ in object_location:
+    #         x, y = get_display_coords(x, y)
+    #         display.drawRectangle(x-5, y-5, 10,10)
 
 
     # if (counter%1000 == 0):
