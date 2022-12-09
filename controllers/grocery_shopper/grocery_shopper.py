@@ -7,7 +7,7 @@ from controller import Supervisor
 from controller import Robot
 
 from components import Pose, Map
-from components import Manager, Localization, Mapping, SLAM, Device, RobotController, Manipulation, Planning, EdgeDetection
+from components import Manager, Localization, Mapping, SLAM, Device, RobotController, Manipulation, Planning, EdgeDetection, Vision
 
 
 
@@ -18,28 +18,30 @@ print("=== Initializing Grocery Shopper...")
 supervisor = Supervisor()
 timeStep = int(4*supervisor.getBasicTimeStep())
 manipulation = Manipulation(4, supervisor, timeStep)
-
+vision = Vision()
 
 ## Main Loop
 count = 0
 while supervisor.step(timeStep) != -1:
-    if count == 0:
-        manipulation.setDrivingState()
-    if count == 20:
-        manipulation.openGripper()
-    if count == 30:
-        manipulation.moveArmToCube()
-    if count == 60:
-        manipulation.grabCube()
-    if count == 70:
-        manipulation.closeGripper()
-    if count == 80:
-        manipulation.setDrivingState()
-    if count == 100:
-        manipulation.moveArmToBox()
-    if count == 120:
-        manipulation.openGripper()
-    count += 1
+    if (count == 0):
+        print(vision.detect())
+    # if count == 0:
+    #     manipulation.setDrivingState()
+    # if count == 20:
+    #     manipulation.openGripper()
+    # if count == 30:
+    #     manipulation.moveArmToCube()
+    # if count == 60:
+    #     manipulation.grabCube()
+    # if count == 70:
+    #     manipulation.closeGripper()
+    # if count == 80:
+    #     manipulation.setDrivingState()
+    # if count == 100:
+    #     manipulation.moveArmToBox()
+    # if count == 120:
+    #     manipulation.openGripper()
+    # count += 1
 
 
 # """grocery controller."""

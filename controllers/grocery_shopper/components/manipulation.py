@@ -81,8 +81,8 @@ class Manipulation:
                 
 
     def closeGripper(self):
-        self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.0275)
-        self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.0275)
+        self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.028)
+        self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.028)
 
     def grabCube(self):
         target = [1.0,0.075,1.10]

@@ -33,7 +33,7 @@ class Vision:
        
         if toggleShow:
             self.show_image(img, img_mask, isObj)
-        return (isObj, img, img_mask)
+        return (isObj, img, img_mask, object_positions_list)
  
     #prints the image
     def show_image(self, img, mask, isObj):
