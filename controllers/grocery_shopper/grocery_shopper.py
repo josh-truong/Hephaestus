@@ -84,9 +84,11 @@ The width of the lines will hopefully merge with other nearby lines.
 path_planning = py_trees.composites.Sequence("Sequence")
 path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
 path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
-
 path_planning.setup_with_descendants()
-writer.env.rerun_rrt = True
+
+
+block_collection = py_trees.composites.Sequence("Sequence")
+block_collection.setup_with_descendants()
 
 
 counter = 0
