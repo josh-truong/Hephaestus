@@ -46,8 +46,8 @@ class Blackboard:
         # Setting variables
         # py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = True
-        # writer.controller_type = 'manual'
-        writer.controller_type = 'autonomous'
+        writer.controller_type = 'manual'
+        # writer.controller_type = 'autonomous'
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
@@ -61,7 +61,7 @@ class Blackboard:
         writer.robot.msg = ""
 
         writer.env.map = Map()
-        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
+        writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
         writer.env.behavior_state = 0
         writer.env.xmax_boundary = 360
         writer.env.ymax_boundary = 360
@@ -77,6 +77,7 @@ class Blackboard:
         writer.env.vaiable_waypoints = []
         # writer.env.vaiable_waypoints = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\viable_waypoints.npy').tolist()
         writer.env.object_location = []
+        writer.env.object_location = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\object_location.npy').tolist()
 
         writer.ik.rtol = 0.2
         writer.ik.atol = 3.14/10

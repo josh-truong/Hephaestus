@@ -93,6 +93,7 @@ block_collection.setup_with_descendants()
 
 counter = 0
 # Main Loop
+writer.env.behavior_state = 1
 while robot.step(int(robot.getBasicTimeStep())) != -1:
     if (reader.env.behavior_state == 0):
         if (reader.env.num_completed_paths == reader.env.max_completed_paths): writer.env.behavior_state = 1
