@@ -11,10 +11,10 @@ from behaviors.models import ConfigSpace
 from behaviors import Blackboard
 from behaviors import Controller
 from behaviors import Mapping
-from behaviors import FilteringMap
+from behaviors import DenoiseMap
 from behaviors import LineDetection
 from behaviors import MapBounds
-from behaviors import CameraBounds
+from behaviors import CameraVision
 from behaviors import ObstacleAvoidance
 from behaviors import Planning
 from behaviors import RRT
@@ -37,23 +37,56 @@ nodes = planning.rrt(
     goal_point=np.random.randint(0,360,2), 
     k=1000, 
     delta_q=10, 
-    map=ConfigSpace().run(reader.env.map.map))
+    map=ConfigSpace().convolve(reader.env.map.map))
 writer.env.waypoints = planning.getWaypoints(nodes)
 
+"""
+Main method of autonomous mapping uses RRT to explore its environment and to allow
+the robot to update the map using it's lidar readings. Ideally the robot will call
+rrt several times at the beginning but as it learns about the environment rrt will 
+be called less.
+
+Therefore, the ObstacleAvoidance behavior is crucial for the overal performance as it 
+will call RRT if theres a conflict with the robot path. ObstacleAvoidance implements 
+both a passive and active avoidance behavior.
+    1) Actively check the waypoints with the current map and see if any collision
+    between waypoint and obstacle has occured and call to rerun rrt.
+    2) Implementing a state behavior with lidar readings if using the 25th percentile
+    of the lidar readings to determine the mean distance of the closest obstacle. If a 
+    threshold has been reached tell the robot to reverse to a certain distance and rerun
+    rrt.
+
+The CameraVision goal is to detect the objects of interests estimate the distance
+of the object and calculate an estimate location of the object in world coordinates.
+Save the location in object_location variable. 
+"""
 autonomous_mapping = py_trees.composites.Sequence("Sequence")
 autonomous_mapping.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
 autonomous_mapping.add_child(ObstacleAvoidance(name="Avoiding Obstacle", writer=writer, reader=reader))
 autonomous_mapping.add_child(RRT(name="RRT", writer=writer, reader=reader))
 autonomous_mapping.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
-autonomous_mapping.add_child(FilteringMap(name="Filtering Controller", writer=writer, reader=reader))
-# autonomous_mapping.add_child(CameraBounds(name="Detecting Cube", writer=writer, reader=reader))
+autonomous_mapping.add_child(DenoiseMap(name="Denoising Map", writer=writer, reader=reader))
+autonomous_mapping.add_child(CameraVision(name="Detecting Cube", writer=writer, reader=reader))
 autonomous_mapping.setup_with_descendants()
 
-# path_planning = py_trees.composites.Sequence("Sequence")
-# path_planning.add_child(MapBounds(name="Detecting Obstacle Bounds", writer=writer, reader=reader))
-# autonomous_mapping.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
-# path_planning.add_child(RRT(name="Running RRT", writer=writer, reader=reader))
+"""
+path_planning sequence will run only once.
+- Detect the lines/edges of the obstacle and draw on map with a width
+The width of the lines will hopefully merge with other nearby lines.
+    - The Hough Lines are represented in white pixels
+- Draw the bounds of the white pixels
+    - Represented by the red rectangles
+- Running kmeans of through the estimate object location
+    - The k centroids will represent with high probability of the object location.
+    - We can then run rrt to the estimate location of the object. And have the camera 
+    vision assist in picking the blocks
+"""
+path_planning = py_trees.composites.Sequence("Sequence")
+path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
+path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
 
+path_planning.setup_with_descendants()
+writer.env.rerun_rrt = True
 
 
 counter = 0
@@ -64,5 +97,23 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
         autonomous_mapping.tick_once()
     elif (reader.env.behavior_state == 1):
         path_planning.tick_once()
+        writer.env.behavior_state = 2
+
+        # waypoints = []
+        # for waypoint in reader.env.waypoints:
+        #     wx, wy = DisplayOverlays(writer, reader).get_display_coords(waypoint[0],waypoint[1])
+        #     waypoints.append([wx, wy])
+        
+        # waypoints = np.array(waypoints)
+        # plt.imshow(reader.env.map.map)
+        # plt.scatter(waypoints[:,0],waypoints[:,1], color='green', s=0.5)
+        # plt.show()
     else:
         pass
+
+    # counter += 1
+    # if (counter%3000 == 0):
+    #     np.save("assets/map.npy", reader.env.map.map)
+    #     np.save("assets/viable_waypoints.npy", reader.env.vaiable_waypoints)
+    #     np.save("assets/object_location.npy", reader.env.object_location)
+    #     writer.robot.msg = "Map, waypoints, est. cube location saved!"
