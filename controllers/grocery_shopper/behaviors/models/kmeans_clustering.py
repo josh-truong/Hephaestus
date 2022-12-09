@@ -14,6 +14,7 @@ author: Atsushi Sakai (@Atsushi_twi)
 import math
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 # k means parameters
 MAX_LOOP = 10
@@ -66,7 +67,7 @@ class Clusters:
         y = [self.y[i] for i, label in enumerate(self.labels) if label == target_label]
         return x, y
 
-class Kmeans:
+class KmeansClustering:
     def run(self, rx, ry, nc):
         clusters = Clusters(rx, ry, nc)
         clusters.calc_centroid()

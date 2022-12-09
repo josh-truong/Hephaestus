@@ -2,6 +2,7 @@ from .constants import RobotConstants, LidarConstants
 from .ConfigSpace import ConfigSpace
 from .Devices import Device
 from .Displays import DisplayOverlays
+from .kmeans_clustering import KmeansClustering
 from .Localization import Localization
 from .MappingModel import MappingModel
 from .ObjectBound import ObjectBound
