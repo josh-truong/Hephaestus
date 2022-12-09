@@ -1,10 +1,10 @@
 import numpy as np
 from .utils import Pose
-from .localization import Localization
+from .Localization import Localization
 
 from scipy.signal import convolve2d
 
-class ControllerModel():
+class SpeedController():
     def __init__(self, writer, reader):
         self.w, self.r = writer, reader
         self.rtol, self.atol = self.r.ik.rtol, self.r.ik.atol

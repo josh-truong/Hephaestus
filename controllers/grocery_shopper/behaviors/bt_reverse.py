@@ -1,6 +1,6 @@
 import py_trees
 import numpy as np
-from .models import ControllerModel
+from .models import SpeedController
 
 class Reverse(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -13,7 +13,7 @@ class Reverse(py_trees.behaviour.Behaviour):
 
     def setup(self):
         # self.log_message("setup()")
-        self.Driver = ControllerModel(self.w, self.r)
+        self.Driver = SpeedController(self.w, self.r)
         self.detect_depth  = 0.7
         self.desired_depth = 1.5
         self.current_depth = self.detect_depth

@@ -1,7 +1,6 @@
 import py_trees
-from .models import Planning
 import numpy as np
-from .models import ConfigSpace
+from .models import Planning
 from .models import DisplayOverlays
 import matplotlib.pyplot as plt
 
@@ -30,7 +29,6 @@ class RRT(py_trees.behaviour.Behaviour):
 
         pose = self.r.robot.pose
         x, y = self.display.get_display_coords(pose.x, -pose.y)
-        # map = ConfigSpace().run(self.r.env.map.map)
         map = self.r.env.map.map
         from_point = np.array([x, y])
         to_point = np.random.randint(0,360, 2)
@@ -40,9 +38,7 @@ class RRT(py_trees.behaviour.Behaviour):
             self.w.robot.msg = "EXCEPTION CAUGHT FOR RRT!"
             return py_trees.common.Status.SUCCESS
 
-        # nodes = self.planner.rrt([x, y], np.random.randint(0,360,2), 1000, 10, map)
         waypoints = self.planner.getWaypoints(nodes)
-
         self.w.env.waypoints = waypoints
         self.w.env.state = 0
 

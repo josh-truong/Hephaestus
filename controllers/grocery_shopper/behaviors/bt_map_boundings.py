@@ -1,5 +1,7 @@
 import py_trees
-from .models import EdgeDetection
+from .models import ObjectBound
+from .models import DisplayOverlays
+import numpy as np
 
 
 class MapBounds(py_trees.behaviour.Behaviour):
@@ -14,23 +16,19 @@ class MapBounds(py_trees.behaviour.Behaviour):
 
     def setup(self):
         # self.log_message("setup()")
-        self.map_frequency = self.r.env.refresh_hz*4
-        self.map_counter = 0
-        self.detection = EdgeDetection(self.w, self.r)
+        self.boundMap = ObjectBound()
+        self.Displays = DisplayOverlays(self.w, self.r)
 
     def initialise(self):
         # self.log_message("initialise()")
         pass
 
     def update(self):
-        self.map_counter += 1
-        self.feedback_message = f"Map detection[{self.map_frequency - self.map_counter}]."
-        if (self.map_counter%self.map_frequency == 0):
-            self.map_counter = 0
-            map_bounds = self.detection.get_obstacle_bound(self.r.env.map.map, 100)
-            self.detection.draw_bounds(map_bounds, 0xFF0000)
-        
-        self.log_message("update()", self.feedback_message)
+        self.log_message("update()", f"Detecting the bounds of obstacles.")
+        blobs = self.boundMap.return_blobs(self.r.env.map.map.copy())
+        bounds = self.boundMap.return_bounds(blobs)
+        self.Displays.draw_obstacle_bounds(self.w.device.display, bounds, 0xFF0000)
+        self.Displays.draw_viable_waypoints()
         return py_trees.common.Status.SUCCESS
         
     def terminate(self, new_status):

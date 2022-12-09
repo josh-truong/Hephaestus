@@ -1,12 +1,8 @@
 import py_trees
 import numpy as np
-from scipy.signal import convolve2d
-from .models import ConfigSpace
 from .models import DisplayOverlays
-import matplotlib.pyplot as plt
-from .models import ControllerModel
+from .models import SpeedController
 from .models import Localization
-from .models import Planning
 
 class ObstacleAvoidance(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -22,7 +18,7 @@ class ObstacleAvoidance(py_trees.behaviour.Behaviour):
         self.frequency = 200
         self.counter = 0
         self.display = DisplayOverlays(self.w, self.r)
-        self.Driver = ControllerModel(self.w, self.r)
+        self.Driver = SpeedController(self.w, self.r)
 
         # Tracking New Behavior if triggered
         self.detect_depth  = 0.7

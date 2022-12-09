@@ -2,7 +2,7 @@ import py_trees
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+from .models import DisplayOverlays
 
 class LineDetection(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
@@ -21,31 +21,30 @@ class LineDetection(py_trees.behaviour.Behaviour):
         self.threshold = 30  # minimum number of votes (intersections in Hough grid cell)
         self.min_line_length = 50  # minimum number of pixels making up a line
         self.max_line_gap = 30  # maximum gap in pixels between connectable line segments
-        self.counter = 0
-        self.frequency = self.r.env.refresh_hz*3
+        self.Display = DisplayOverlays(self.w, self.r)
 
     def initialise(self):
         self.log_message("initialise()")
 
     def update(self):
-        self.counter += 1
-        self.log_message("update()", f"Line Detecting in {self.frequency - self.counter}")
-        if (self.counter%self.frequency == 0):
-            self.counter = 0
+        img = self.r.env.map.map
+        img = np.uint8(img*255)
+        edges = cv2.Canny(img, self.low_tol, self.high_tol)
+        line_image = np.copy(img) * 0  # creating a blank to draw lines on
+        # Run Hough on edge detected image
+        lines = cv2.HoughLinesP(edges, self.rho, self.theta, self.threshold, np.array([]),
+                            self.min_line_length, self.max_line_gap)
+        if (lines is None): return py_trees.common.Status.SUCCESS
+        lines = np.row_stack(lines)
 
-            img = self.r.env.map.map
-            img = np.uint8(img*255) # Add a filter method here
-            edges = cv2.Canny(img, self.low_tol, self.high_tol)
-            line_image = np.copy(img) * 0  # creating a blank to draw lines on
-            # Run Hough on edge detected image
-            lines = cv2.HoughLinesP(edges, self.rho, self.theta, self.threshold, np.array([]),
-                                self.min_line_length, self.max_line_gap)
-            if (lines is None): return py_trees.common.Status.SUCCESS
-            lines = np.row_stack(lines).reshape((-1, 1, 2))
-            # for x1,y1,x2,y2 in lines:
-            #     cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),5)
-            line_image = cv2.polylines(line_image,lines,False,(255,0,0),5)
-            # self.r.env.map.map = np.clip(img - np.mean(img - np.clip(line_image, 0, 1)), 0, 1)
+        # Detect only outliers in the x coordinates using IQR
+        lines_length = np.array([[abs(x1-x2),abs(y1-y2)] for x1,y1,x2,y2 in lines])
+        xIQR = np.subtract(*np.percentile(lines_length[:,0],[75,25]))
+        lines = lines[np.where(lines_length[:,0] > xIQR)]
+        for x1,y1,x2,y2 in lines:
+            cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),5)
+        self.Display.redraw_display(line_image/255)
+        self.w.env.map.map = line_image
         return py_trees.common.Status.SUCCESS
         
     def terminate(self, new_status):

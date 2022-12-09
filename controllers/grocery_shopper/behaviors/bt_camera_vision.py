@@ -1,13 +1,13 @@
 import py_trees
 import numpy as np
 import math
-from .models import EdgeDetection, Vision
+from .models import ObjectBound, Vision
 import matplotlib.pyplot as plt
 from .models import DisplayOverlays
 
-class CameraBounds(py_trees.behaviour.Behaviour):
+class CameraVision(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
-        super(CameraBounds, self).__init__(name)
+        super(CameraVision, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
 
@@ -16,11 +16,13 @@ class CameraBounds(py_trees.behaviour.Behaviour):
 
     def setup(self):
         # self.log_message("setup()")
-        self.camera_frequency = self.r.env.refresh_hz*1
+        self.camera_frequency = self.r.env.refresh_hz
         self.camera_counter = 0
-        self.detection = EdgeDetection(self.w, self.r)
+        self.objectBound = ObjectBound()
         self.display = DisplayOverlays(self.w, self.r)
-        self.vision = Vision(self.w, self.r)
+        self.camera = self.r.device.meta_camera
+        width, height = self.camera.getWidth(), self.camera.getHeight()
+        self.vision = Vision(width, height)
 
     def initialise(self):
         # self.log_message("initialise()")
@@ -34,10 +36,10 @@ class CameraBounds(py_trees.behaviour.Behaviour):
             return np.array(lidar_sensor_readings)
 
         self.camera_counter += 1
-        self.feedback_message = f"Camera detection[{self.camera_frequency - self.camera_counter}]."
+        self.feedback_message = f"Object Detection in {self.camera_frequency - self.camera_counter}."
         if (self.camera_counter%self.camera_frequency == 0):
             self.camera_counter = 0
-            centroids, blobs, img_mask = self.vision.detect(toggleShow=False)
+            centroids, blobs, img_mask = self.vision.detect(self.camera.getImageArray(), toggleShow=False)
 
             range_finder = self.r.device.range_finder
             range_width = range_finder.getWidth() 
@@ -46,8 +48,8 @@ class CameraBounds(py_trees.behaviour.Behaviour):
 
             # Update depth display
             self.display.update_depth_display(range_image, range_width)
-            object_blobs = self.detection.return_blobs(img_mask)
-            object_bounds = self.detection.return_bounds(blobs)
+            object_blobs = self.objectBound.return_blobs(img_mask)
+            object_bounds = self.objectBound.return_bounds(blobs)
             self.display.draw_object_bounds(self.r.device.depth_display, object_bounds)
             self.display.draw_estimated_location_on_map()
 
@@ -75,7 +77,6 @@ class CameraBounds(py_trees.behaviour.Behaviour):
                 wy =  +(math.sin(pose.theta)*rx + math.cos(pose.theta)*ry) + pose.y
                 self.w.env.object_location.append([wx, wy, depth])
             
-        
         self.log_message("update()", self.feedback_message)
         return py_trees.common.Status.SUCCESS
         
