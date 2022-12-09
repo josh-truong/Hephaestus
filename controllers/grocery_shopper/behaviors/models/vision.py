@@ -10,19 +10,15 @@ from controller import Camera
 
 #call vision.detect() and pass it a true if you want it to print the mask to the screen
 class Vision:
-    def __init__(self, writer, reader):
-        self.w, self.r = writer, reader
-        self.camera = self.r.device.meta_camera
-        self.img_height = self.camera.getHeight()
-        self.img_width = self.camera.getWidth()
+    def __init__(self, width, height):
+        self.img_width = width
+        self.img_height = height
         self.color_ranges = []
         self.color_ranges.append(((0, 200,200), (7,240,240)))
         return
-    
-    #runs the whole vision protocall returns tuple: (boolean indicating if a blob was found, image, mask showing location of the blob)
-    def detect(self, toggleShow = False):
-        img = self.camera.getImageArray()
         
+    #runs the whole vision protocall returns tuple: (boolean indicating if a blob was found, image, mask showing location of the blob)
+    def detect(self, img, toggleShow = False):
         img_mask = self.do_color_filtering(img)
         blobs = []
         blobs = self.get_blobs(img_mask)
