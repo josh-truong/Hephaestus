@@ -63,7 +63,8 @@ class MappingModel:
         point_world_frame = (T @ point_local_frame).T
         return point_world_frame
 
-    def get_lidar_point_cloud(self, pose):
-        lidar_sensor_readings = self.get_lidar_readings()
+    def get_lidar_point_cloud(self, pose, lidar_sensor_readings=None):
+        if (lidar_sensor_readings is None):
+            lidar_sensor_readings = self.get_lidar_readings()
         point_cloud = self.homogenous_transform(lidar_sensor_readings, pose)
         return point_cloud[:, :2]
