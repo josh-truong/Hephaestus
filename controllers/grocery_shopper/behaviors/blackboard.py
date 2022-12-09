@@ -17,10 +17,12 @@ class Blackboard:
         keys = {
             "debug", "controller_type",
             "constants/robot", "constants/lidar",
-            "device/left_gripper_enc", "device/right_gripper_enc", "device/gps", 
-            "device/compass", "device/lidar", "device/display", "device/keyboard", 
-            "device/left_camera", "device/right_camera", "device/meta_camera", 
-            "device/range_finder", "device/depth_display", "device/disable_lidar",
+            "device/left_gripper_enc", "device/right_gripper_enc", 
+            "device/keyboard", 
+            "device/gps", "device/compass", 
+            "device/lidar", "device/disable_lidar", 
+            "device/meta_camera", "device/range_finder", 
+            "device/display", "device/depth_display", 
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
             "env/goal", "env/object_location", "env/rerun_rrt", "env/state_step",
             "env/num_completed_paths", "env/behavior_state", "env/vaiable_waypoints",
@@ -34,7 +36,7 @@ class Blackboard:
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
-        py_trees.logging.level = py_trees.logging.Level.DEBUG
+        # py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = True
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
@@ -51,13 +53,13 @@ class Blackboard:
         writer.robot.msg = ""
 
         writer.env.map = Map()
-        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\filter_map.npy')
+        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
         writer.env.behavior_state = 0
         writer.env.xmax_boundary = 360
         writer.env.ymax_boundary = 360
         writer.env.rerun_rrt = True
         writer.env.num_completed_paths = 0
-        writer.env.max_completed_paths = 100
+        writer.env.max_completed_paths = 10
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0
@@ -65,6 +67,7 @@ class Blackboard:
         writer.env.goal = None
         writer.env.waypoints = None
         writer.env.vaiable_waypoints = []
+        # writer.env.vaiable_waypoints = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\viable_waypoints.npy').tolist()
         writer.env.object_location = []
 
         writer.ik.rtol = 0.2
@@ -95,8 +98,6 @@ class Blackboard:
         writer.device.lidar = device.lidar
         writer.device.display = device.display
         writer.device.depth_display = device.depth_display
-        # writer.device.left_camera = device.left_camera
-        # writer.device.right_camera = device.right_camera
         writer.device.meta_camera = device.meta_camera
         writer.device.range_finder = device.range_finder
         writer.device.keyboard = device.keyboard
