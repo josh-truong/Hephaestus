@@ -81,17 +81,17 @@ class Manipulation:
                 
 
     def closeGripper(self):
-        self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.028)
-        self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.028)
+        self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.0275)
+        self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.0275)
 
-    def grabCube(self):
-        target = [1.0,0.075,1.10]
+    def grabCube(self, xTarget):
+        target = [1.0,xTarget,1.10]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
 
-    def moveArmToCube(self):
+    def moveArmToCube(self, xTarget):
         # need to get cube position
-        target = [1.0,0.075,1.25]
+        target = [1.0,xTarget,1.25]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
         # self.grabCube(target)

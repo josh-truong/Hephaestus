@@ -17,31 +17,41 @@ print("=== Initializing Grocery Shopper...")
 
 supervisor = Supervisor()
 timeStep = int(4*supervisor.getBasicTimeStep())
+vision = Vision(supervisor, timeStep)
 manipulation = Manipulation(4, supervisor, timeStep)
-vision = Vision()
 
 ## Main Loop
 count = 0
+xTarget = 0
 while supervisor.step(timeStep) != -1:
     if (count == 0):
-        print(vision.detect())
-    # if count == 0:
-    #     manipulation.setDrivingState()
-    # if count == 20:
-    #     manipulation.openGripper()
-    # if count == 30:
-    #     manipulation.moveArmToCube()
-    # if count == 60:
-    #     manipulation.grabCube()
-    # if count == 70:
-    #     manipulation.closeGripper()
-    # if count == 80:
-    #     manipulation.setDrivingState()
-    # if count == 100:
-    #     manipulation.moveArmToBox()
-    # if count == 120:
-    #     manipulation.openGripper()
-    # count += 1
+        locations, blobs, mask, img = vision.detect()
+        print(locations)
+        # vision.show_image(img, mask, True)
+        for blob in blobs:
+            print(len(blob))
+        diff = (120 - locations[0][1])
+        if diff <= 0:
+            xTarget = (120 - locations[0][1]) * 0.009#0.009204136
+        else:
+            xTarget = (120 - locations[0][1]) * 0.01#0.009204136
+    if count == 0:
+        manipulation.setDrivingState()
+    if count == 20:
+        manipulation.openGripper()
+    if count == 30:
+        manipulation.moveArmToCube(xTarget)
+    if count == 70:
+        manipulation.grabCube(xTarget)
+    if count == 80:
+        manipulation.closeGripper()
+    if count == 90:
+        manipulation.setDrivingState()
+    if count == 110:
+        manipulation.moveArmToBox()
+    if count == 140:
+        manipulation.openGripper()
+    count += 1
 
 
 # """grocery controller."""

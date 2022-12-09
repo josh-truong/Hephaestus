@@ -10,8 +10,9 @@ from controller import Camera
 
 #call vision.detect() and pass it a true if you want it to print the mask to the screen
 class Vision:
-    def __init__(self):
-        self.camera = Camera("camera")
+    def __init__(self, supervisor, timestep):
+        self.camera = supervisor.getDevice('camera')
+        self.camera.enable(timestep)
         self.img_height = self.camera.getHeight()
         self.img_width = self.camera.getWidth()
         self.color_ranges = []
@@ -33,21 +34,19 @@ class Vision:
        
         if toggleShow:
             self.show_image(img, img_mask, isObj)
-        return (isObj, img, img_mask, object_positions_list)
+        return self.get_blob_centroids(blobs), blobs, img_mask, img
  
     #prints the image
     def show_image(self, img, mask, isObj):
-        plt.imshow(img)
-        plt.title('View')
-        plt.show()
-        
-        plt.imshow(mask)
-        plt.title('Mask')
-        plt.show()
-        
         if isObj:
-            print('objectfound')
-            
+            fig, axs = plt.subplots(1,2)
+            fig.suptitle('Blob Detected')
+            img = np.array(img)
+            img = img.transpose(1, 0, 2)
+            axs[0].imshow(img)
+            axs[1].imshow(mask)
+            plt.tight_layout()
+            plt.show()
         return
         
     def check_if_color_in_range(self, bgr_tuple):    
@@ -57,7 +56,6 @@ class Vision:
             for i in range(len(bgr_tuple)):
                 if bgr_tuple[i] < lower[i] or bgr_tuple[i] > upper[i]:
                     in_range = False
-                    #print(bgr_tuple)
                     break
             if in_range: return True
         return False
@@ -68,15 +66,15 @@ class Vision:
     def do_color_filtering(self, img):
         mask = np.zeros([self.img_height, self.img_width]) 
         
-        for x in range(self.img_width):
-            for y in range(self.img_height):
-                red   = img[x][y][0]
-                green = img[x][y][1]
-                blue  = img[x][y][2]
-                if self.check_if_color_in_range((blue, green, red)):
-                  mask[y,x] = 1
-                else:
-                  mask[y,x] = 0
+        for i in range(self.img_width*self.img_height):
+            x, y = i%self.img_width, i//self.img_width
+            red   = img[x][y][0]
+            green = img[x][y][1]
+            blue  = img[x][y][2]
+            if self.check_if_color_in_range((blue, green, red)):
+                mask[y,x] = 1
+            else:
+                mask[y,x] = 0
         return mask
     
     
@@ -88,7 +86,6 @@ class Vision:
             return
         if img_mask[cur_coordinate[0], cur_coordinate[1]] == 0.0: 
             return
-        print("in expand")
         img_mask[cur_coordinate[0],cur_coordinate[1]] = 0
         coordinates_in_blob.append(cur_coordinate)
     
@@ -116,21 +113,12 @@ class Vision:
           if mask[y,x] == 1:
             coords = []
             self.expand(mask, (y,x), coords) 
-            blobs_list.append(coords) 
-            print("in: ", coords)
-     
-    
+            blobs_list.append(coords)
       return blobs_list
           
     def get_blob_centroids(self, blobs_list):
         object_positions_list = []
         for blob in blobs_list:
-          if len(blob) > 1500:
-            print("hey  ")
             center = np.mean(blob, axis=0)
-            print("center = ", center[0])
-            #center_x = np.mean(blob, axis=1)
             object_positions_list.append((center[0], center[1]))
-    
-        print("obj ", object_positions_list)
         return object_positions_list
