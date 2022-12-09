@@ -22,18 +22,19 @@ class Blackboard:
             "device/left_camera", "device/right_camera", "device/meta_camera", 
             "device/range_finder", "device/depth_display", "device/disable_lidar",
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
-            "env/goal", "env/object_location", "env/rerun_rrt",
-            "env/num_completed_paths", "env/behavior_state", "env/check_state",
+            "env/goal", "env/object_location", "env/rerun_rrt", "env/state_step",
+            "env/num_completed_paths", "env/behavior_state", "env/vaiable_waypoints",
+            "env/max_completed_paths", "env/xmax_boundary", "env/ymax_boundary",
             "ik/rtol", "ik/atol", "ik/etol", "ik/p1", "ik/p2", "ik/p3",
             "robot/pose","robot/robot", "robot/parts", "robot/vL", "robot/vR", 
-            "robot/velocity_rate", "robot/ts",
+            "robot/velocity_rate", "robot/ts", "robot/reverse", "robot/msg"
         }
         for key in keys:
             writer.register_key(key=key, access=py_trees.common.Access.WRITE)
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
-        # py_trees.logging.level = py_trees.logging.Level.DEBUG
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = True
         # writer.controller_type = 'manual'
         writer.controller_type = 'autonomous'
@@ -46,28 +47,24 @@ class Blackboard:
         writer.robot.vL = 0
         writer.robot.vR = 0
         writer.robot.ts = 0
+        writer.robot.reverse = False
+        writer.robot.msg = ""
 
         writer.env.map = Map()
+        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\filter_map.npy')
         writer.env.behavior_state = 0
+        writer.env.xmax_boundary = 360
+        writer.env.ymax_boundary = 360
         writer.env.rerun_rrt = True
-        writer.env.check_state = True
         writer.env.num_completed_paths = 0
-        # writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
+        writer.env.max_completed_paths = 100
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0
+        writer.env.state_step = 15
         writer.env.goal = None
         writer.env.waypoints = None
-        # writer.env.waypoints = [
-        #     (  4.80,  0.00,  0.00),
-        #     (  4.79, -2.22,  0.00),
-        #     (-12.83, -2.30,  0.00),
-        #     (-12.78,  2.03,  0.00),
-        #     (  4.89,  1.80,  0.00),
-        #     (  4.94,  5.68,  0.00),
-        #     (-13.01,  5.51,  0.00),
-        #     (-13.24, -5.64,  0.00)
-        # ]
+        writer.env.vaiable_waypoints = []
         writer.env.object_location = []
 
         writer.ik.rtol = 0.2

@@ -8,6 +8,7 @@ Created on Tues Nov 29 2022
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+from scipy import interpolate
 
 
 class Node:
@@ -146,6 +147,7 @@ class Planning:
         :param delta_q: Maximum distance allowed between vertices
         :returns List of RRT graph nodes
         '''
+        
         node_list = []
         node_list.append(Node(starting_point, parent=None)) # Add Node at starting point with no parent
         # TODO: Your code here
@@ -170,16 +172,16 @@ class Planning:
                 if goal_point is not None:
                     if np.linalg.norm(newNode.point - goal_point) < 1e-5:
                         return node_list
-
+        print(f"RRT could not find path from {starting_point} to {goal_point}.")
         return node_list
 
 
     def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = ((display[0]*0.5) - x) / (display[0]/world[0])
         y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
-        return x,-y,0
+        return [x,-y]
 
-    def getWaypoints(self, nodes):
+    def getWaypoints(self, nodes, display_coords=False):
         # list of waypoints in map coords, tulpes with (x, y, theta)
         waypoints = []
         goal_node = nodes[-1]
@@ -191,15 +193,45 @@ class Planning:
                     cur_node = cur_node.parent
                 else:
                     waypoints.reverse()
-                    waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
+                    try:
+                        waypoints = self.smooth_path(waypoints)[:-1]
+                        new_waypoints = []
+                        for i in range(len(waypoints)-1):
+                            start, end = waypoints[i], waypoints[i+1]
+                            num_pixels_between = abs(start[0]-end[0])+abs(start[1]-end[1])
+                            new_waypoints.extend(np.linspace(start, end, int(num_pixels_between)))
+                        waypoints = [self.get_world_coords(x, y) for x,y in new_waypoints]
+                        return waypoints
+                    except:
+                        waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
+                        return waypoints
                     return waypoints
+
+    def smooth_path(self, waypoints):
+        if (waypoints is None): return []
+        waypoints = np.array(waypoints)
+        x, y = waypoints[:,0], waypoints[:,1]
+
+        # Remove duplicate points
+        okay = np.where(np.abs(np.diff(x)) + np.abs(np.diff(y)) > 0)[0]
+        xn = np.r_[x[okay], x[-1], x[0]]
+        yn = np.r_[y[okay], y[-1], y[0]]
+
+        # create spline function
+        tck, u = interpolate.splprep([xn, yn], s=0, k=3, per=True)
+
+        #create interpolated lists of points
+        xn, yn = interpolate.splev(np.linspace(0, 1, 20), tck)
+        return list(zip(xn, yn))
+
 
 # if __name__ == "__main__":
 #     planner = Planning()
 #     K = 1000 # Feel free to adjust as desired
-#     map = np.load("../assets/filter_map.npy")
+#     map = np.load("../../assets/filter_map.npy")
 
 #     starting_point = [20,200]
 #     goal = np.array([325, 325])
 #     nodes = planner.rrt(starting_point, goal, K, 10, map)
-#     planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
+#     planner.getWaypoints(nodes)
+#     # planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')

@@ -5,14 +5,15 @@ from .models import EdgeDetection
 class MapBounds(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
         super(MapBounds, self).__init__(name)
-        self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
+        # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
 
     def log_message(self, function_name: str, feedback_message=""):
-        self.logger.debug("%s [%s::%s][%s]" % (self.name, function_name, self.__class__.__name__, feedback_message))
+        # self.logger.debug("%s [%s::%s][%s]" % (self.name, function_name, self.__class__.__name__, feedback_message))
+        pass
 
     def setup(self):
-        self.log_message("setup()")
+        # self.log_message("setup()")
         self.map_frequency = self.r.env.refresh_hz*4
         self.map_counter = 0
         self.detection = EdgeDetection(self.w, self.r)
