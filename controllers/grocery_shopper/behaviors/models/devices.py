@@ -28,10 +28,9 @@ class Device:
         self.compass = self.enable_compass()
         self.lidar = self.enable_lidar()
         self.display, self.depth_display = self.enable_display()
-        self.left_camera, self.right_camera, self.meta_camera, self.range_finder = self.enable_camera()
+        self.meta_camera, self.range_finder = self.enable_camera()
         self.keyboard = self.enable_keyboard()
 
-        
 
     def set_robot_parts(self, target_pos=None):
         """
@@ -58,23 +57,11 @@ class Device:
         return left_gripper_enc, right_gripper_enc
 
     def enable_camera(self):
-        # Enable Camera
-        # camera = self.robot.getDevice('camera')
-        # camera.enable(self.timestep)
-        # camera.recognitionEnable(self.timestep)
-        left_camera = self.robot.getDevice('MultiSense S21 left camera')
-        left_camera.enable(self.timestep)
-        right_camera = self.robot.getDevice('MultiSense S21 right camera')
-        right_camera.enable(self.timestep)
         meta_camera = self.robot.getDevice('MultiSense S21 meta camera')
         meta_camera.enable(self.timestep)
         range_finder = self.robot.getDevice('MultiSense S21 meta range finder')
         range_finder.enable(self.timestep)
-        return left_camera, right_camera, meta_camera, range_finder
-
-    # def get_camera_image(self):
-    #     """Returns (240, 135, 3) image array"""
-    #     return self.camera.getImageArray()
+        return meta_camera, range_finder
 
     def enable_gps(self):
         gps = self.robot.getDevice("gps")
