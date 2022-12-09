@@ -4,6 +4,8 @@ manipulation.py
 Last updated on Sun Dec 4 2022
 @Lead: Nathan Kochera
 """
+
+
 import numpy as np
 import math
 import ikpy

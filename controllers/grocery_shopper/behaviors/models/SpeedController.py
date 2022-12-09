@@ -1,3 +1,10 @@
+"""
+SpeedController.py
+
+Last updated on Fri Dec 9 2022
+@Lead: Joshua Truong
+"""
+
 import numpy as np
 from .utils import Pose
 from .Localization import Localization

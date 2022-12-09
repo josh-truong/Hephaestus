@@ -1,9 +1,10 @@
 """
-planning.py
+PLanningModel.py
 
-Created on Tues Nov 29 2022
+Last updated on Fri Dec 9 2022
 @Lead: Nathan Kochera
 """
+
 
 import numpy as np
 import matplotlib.pyplot as plt

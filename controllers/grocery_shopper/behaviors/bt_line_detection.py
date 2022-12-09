@@ -1,5 +1,12 @@
-import py_trees
+"""
+bt_line_detection.py
+
+Last updated on Fri Dec 9 2022
+@Lead: Joshua Truong
+"""
+
 import cv2
+import py_trees
 import numpy as np
 import matplotlib.pyplot as plt
 from .models import DisplayOverlays

@@ -1,3 +1,10 @@
+"""
+bt_obstacle_avoidance.py
+
+Last updated on Fri Dec 9 2022
+@Lead: Joshua Truong
+"""
+
 import py_trees
 import numpy as np
 from .models import DisplayOverlays

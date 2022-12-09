@@ -1,3 +1,10 @@
+"""
+ConfigSpace.py
+
+Last updated on Fri Dec 9 2022
+@Lead: Joshua Truong
+"""
+
 import numpy as np
 from scipy.signal import convolve2d
 import matplotlib.pyplot as plt

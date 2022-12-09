@@ -1,9 +1,10 @@
 """
 utils.py
 
-Created on Fri Nov 19 2022
+Last updated on Fri Dec 9 2022
 @Lead: Joshua Truong
 """
+
 
 import numpy as np
 import matplotlib.pyplot as plt

@@ -1,3 +1,10 @@
+"""
+bt_map_boundings.py
+
+Last updated on Fri Dec 9 2022
+@Lead: Joshua Truong
+"""
+
 import py_trees
 from .models import ObjectBound
 from .models import DisplayOverlays

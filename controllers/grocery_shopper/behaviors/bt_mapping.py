@@ -1,3 +1,10 @@
+"""
+bt_mapping.py
+
+Last updated on Fri Dec 9 2022
+@Lead: Joshua Truong
+"""
+
 import py_trees
 import numpy as np
 from .models import MappingModel
@@ -27,15 +34,6 @@ class Mapping(py_trees.behaviour.Behaviour):
         point_cloud = self.MapModel.get_lidar_point_cloud(pose)
         self.Display.display_point_cloud(point_cloud)
         self.Display.draw_robot_position()
-
-        # for x, y in point_cloud:
-        #     x, y = self.Display.get_display_coords(x, y)
-        #     xmax_bound = self.w.env.xmax_boundary
-        #     ymax_bound = self.w.env.ymax_boundary
-        #     xmax_bound = x if (x > xmax_bound) else xmax_bound
-        #     ymax_bound = y if (y > ymax_bound) else ymax_bound
-        #     self.w.env.xmax_boundary = int(np.ceil(xmax_bound))
-        #     self.w.env.ymax_boundary = int(np.ceil(ymax_bound))
 
         self.feedback_message = f"{len(point_cloud)} lidar points detected."
         self.log_message("update()", self.feedback_message)

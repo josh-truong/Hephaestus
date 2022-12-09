@@ -1,9 +1,6 @@
 """
-
 Object clustering with k-means algorithm
-
 author: Atsushi Sakai (@Atsushi_twi)
-
 """
 
 import math
@@ -63,9 +60,6 @@ class Clusters:
         return x, y
 
 class Kmeans:
-    def __init__(self):
-        pass
-
     def run(self, rx, ry, nc):
         clusters = Clusters(rx, ry, nc)
         clusters.calc_centroid()
@@ -80,7 +74,6 @@ class Kmeans:
             if d_cost < DCOST_TH:
                 break
             pre_cost = cost
-
         return clusters
 
     def update_positions(self, cx, cy):
@@ -99,13 +92,17 @@ class Kmeans:
 
 
 
+
+
+
+
+
+
 def get_display_coords(x, y, display=(360, 360), world=(30, 16)):
     x = (display[0]*0.5) - (x * (display[0]/world[0]))
     y = display[1] - ((display[1]*0.5) - (y * (display[1]/world[1])))
     x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
     return [int(x), int(y)]
-
-
 
 w_points = np.load("object_location.npy")
 d_points = np.array([get_display_coords(x,y) for x,y,_ in w_points])
