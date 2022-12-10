@@ -8,6 +8,7 @@ import math
 from .bt_RotateLeft90 import RotateLeft90
 from .bt_RotateRight90 import RotateRight90
 from .bt_move_forward import MoveForward
+from .bt_move_backward import MoveBackward
 
 
 class LockAndLoad(py_trees.behaviour.Behaviour):
@@ -18,6 +19,8 @@ class LockAndLoad(py_trees.behaviour.Behaviour):
         self.root_l = py_trees.composites.Sequence("Sequence")
         self.root_l.add_child(RotateLeft90("Rotate Left", self.w, self.r))
         self.root_l.add_child(MoveForward("Move Forward", self.w, self.r))
+        self.root_l.add_child(RotateLeft90("Rotate To 90", self.w, self.r))
+        self.root_l.add_child(MoveBackward("Backing up", self.w, self.r))
         self.root_l.setup_with_descendants()
 
         self.root_r = py_trees.composites.Sequence("Sequence")

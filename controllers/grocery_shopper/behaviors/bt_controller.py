@@ -15,6 +15,9 @@ from .models import Localization
 from .models import ConfigSpace
 
 class Controller(py_trees.behaviour.Behaviour):
+    """
+    Controls the speed of the robot based on IK and waypoints generate by RRT.
+    """
     def __init__(self, name, writer, reader):
         super(Controller, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

@@ -9,5 +9,5 @@ from .ObjectBound import ObjectBound
 from .PlanningModel import Planning
 from .SpeedController import SpeedController
 from .Vision import Vision
-
+from .manipulation import Manipulation
 from .utils import Map, Pose

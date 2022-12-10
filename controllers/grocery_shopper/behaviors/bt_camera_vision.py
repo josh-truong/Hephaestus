@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 from .models import DisplayOverlays
 
 class CameraVision(py_trees.behaviour.Behaviour):
+    """
+    Uses the Multisense s21 camera, range finder, and lidar readings. To estimate the location of object
+    Camera to detect blob, range finder to determine the range of where the blobs is at. Lidar to estimate 
+    the distance as well and use both range finder and lidar distance readings to detmine which offset is the
+    closest to convert local to world coordinates
+    """
     def __init__(self, name, writer, reader):
         super(CameraVision, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
@@ -39,8 +45,10 @@ class CameraVision(py_trees.behaviour.Behaviour):
         self.feedback_message = f"Object Detection in {self.camera_frequency - self.camera_counter}."
         if (self.camera_counter%self.camera_frequency == 0):
             self.camera_counter = 0
+            # Detect yellow blob in image
             centroids, blobs, img_mask = self.vision.detect(self.camera.getImageArray(), toggleShow=False)
 
+            # Find blob range in image
             range_finder = self.r.device.range_finder
             range_width = range_finder.getWidth() 
             image_bytes = range_finder.getRangeImage(data_type="buffer")

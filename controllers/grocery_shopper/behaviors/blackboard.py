@@ -15,6 +15,9 @@ from .models import Map, Pose
 from .models import Device
 
 class Blackboard:
+    """
+    The hub for all accesssible variables.
+    """
     def __init__(self):
         print("=== Initializing Blackboards...")
         # Blackboards for writing
@@ -50,8 +53,8 @@ class Blackboard:
         py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = True
         writer.env.behavior_state = 0
-        # writer.controller_type = 'manual'
-        writer.controller_type = 'autonomous'
+        # writer.controller_type = 'manual'     # Enables manual control over the robot
+        writer.controller_type = 'autonomous'   # Enables autonomous control of the robot which will use the rrt generated waypoints
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
@@ -75,12 +78,11 @@ class Blackboard:
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0
-        # writer.env.state_step = 15
-        writer.env.state_step = 1
+        writer.env.state_step = 15
         writer.env.goal = None
         writer.env.waypoints = None
         writer.env.vaiable_waypoints = []
-        # writer.env.vaiable_waypoints = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\viable_waypoints.npy').tolist()
+        # writer.env.vaiable_waypoints = np.load('assets/viable_waypoints.npy').tolist()
         writer.env.kmeans_state = 1
         writer.env.kmeans_location = []
         writer.env.object_location = []

@@ -12,6 +12,9 @@ from .models import DisplayOverlays
 from .models import ConfigSpace
 
 class DenoiseMap(py_trees.behaviour.Behaviour):
+    """
+    Remove noise from map every small period
+    """
     def __init__(self, name, writer, reader):
         super(DenoiseMap, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

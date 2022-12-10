@@ -86,10 +86,10 @@ The width of the lines will hopefully merge with other nearby lines.
     vision assist in picking the blocks
 """
 path_planning = py_trees.composites.Sequence("Sequence")
-# path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
-# path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
-# path_planning.add_child(LocationFilter(name="Filtering Object Location", writer=writer, reader=reader))
-# path_planning.add_child(KMeans(name="K-means Clustering", writer=writer, reader=reader))
+path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
+path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
+path_planning.add_child(LocationFilter(name="Filtering Object Location", writer=writer, reader=reader))
+path_planning.add_child(KMeans(name="K-means Clustering", writer=writer, reader=reader))
 path_planning.setup_with_descendants()
 
 
