@@ -1,13 +1,13 @@
 from .constants import RobotConstants, LidarConstants
-from .ConfigSpace import ConfigSpace
-from .Devices import Device
-from .Displays import DisplayOverlays
+from .configSpace import ConfigSpace
+from .devices import Device
+from .displays import DisplayOverlays
 from .kmeans_clustering import KmeansClustering
-from .Localization import Localization
-from .MappingModel import MappingModel
+from .localization import Localization
+from .mappingModel import MappingModel
 from .ObjectBound import ObjectBound
 from .PlanningModel import Planning
 from .SpeedController import SpeedController
-from .Vision import Vision
+from .vision import Vision
 
 from .utils import Map, Pose
