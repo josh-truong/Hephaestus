@@ -23,6 +23,8 @@ manipulation = Manipulation(4, supervisor, timeStep)
 ## Main Loop
 count = 0
 xTarget = 0
+yTarget = 0
+top = True
 while supervisor.step(timeStep) != -1:
     if (count == 0):
         locations, blobs, mask, img = vision.detect()
@@ -35,18 +37,33 @@ while supervisor.step(timeStep) != -1:
             xTarget = (120 - locations[0][1]) * 0.0088#0.009204136
         else:
             xTarget = (120 - locations[0][1]) * 0.0095#0.009204136
+        if locations[0][0] <= 75:
+            yTarget = 1.25
+            top = True
+        elif locations[0][0] <= 130:
+            yTarget = 0.7
+            top = False
+        else:
+            yTarget = 1.25
+
     if count == 0:
-        manipulation.setDrivingState()
+        if top:
+            manipulation.setDrivingState()
+        else:
+            manipulation.setMidState()
     if count == 20:
         manipulation.openGripper()
     if count == 30:
-        manipulation.moveArmToCube(xTarget)
+        manipulation.moveArmToCube(xTarget, yTarget)
     if count == 70:
-        manipulation.grabCube(xTarget)
+        manipulation.grabCube(xTarget, yTarget)
     if count == 80:
         manipulation.closeGripper()
     if count == 90:
-        manipulation.setDrivingState()
+        if top:
+            manipulation.setDrivingState()
+        else:
+            manipulation.setMidState()
     if count == 110:
         manipulation.moveArmToBox()
     if count == 140:

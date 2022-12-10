@@ -75,23 +75,28 @@ class Manipulation:
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
 
+    def setMidState(self):
+        target = [0.5,-0.75,0.85]
+        ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
+        self.applyIKResults(ikResults)
+
     def openGripper(self):
         self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.045)
         self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.045)
                 
 
     def closeGripper(self):
-        self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.0275)
-        self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.0275)
+        self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.03)
+        self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.03)
 
-    def grabCube(self, xTarget):
-        target = [1.0,xTarget,1.10]
+    def grabCube(self, xTarget, yTarget):
+        target = [1.0,xTarget,yTarget - 0.15]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
 
-    def moveArmToCube(self, xTarget):
+    def moveArmToCube(self, xTarget, yTarget):
         # need to get cube position
-        target = [1.0,xTarget,1.25]
+        target = [1.0,xTarget,yTarget]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
         # self.grabCube(target)
