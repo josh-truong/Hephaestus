@@ -12,6 +12,10 @@ from .models import SpeedController
 from .models import Localization
 
 class ObstacleAvoidance(py_trees.behaviour.Behaviour):
+    """
+    The heart of the autonomous mapping. Backing up if obstacle is detected and active waypoint checking if 
+    collided on map
+    """
     def __init__(self, name, writer, reader):
         super(ObstacleAvoidance, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

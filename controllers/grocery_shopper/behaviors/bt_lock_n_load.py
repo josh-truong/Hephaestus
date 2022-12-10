@@ -12,6 +12,11 @@ from .bt_move_backward import MoveBackward
 
 
 class LockAndLoad(py_trees.behaviour.Behaviour):
+    """
+    Main purpose is to detect the blob using the side camera once it has reach the middle of the screen
+    turn the robot 90 degrees in the blob direction move forward till 1.5m use ik to pickup block.
+    Based on Nathan requirements and reverse and continue to move through aisle
+    """
     def __init__(self, name, writer, reader):
         super(LockAndLoad, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

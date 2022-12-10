@@ -13,6 +13,11 @@ import matplotlib.pyplot as plt
 
 
 class MapBounds(py_trees.behaviour.Behaviour):
+    """
+    Calculate the rectangle bounds of the obstacle to determine where obstacle is and generate waypoints in
+    between the obstacles to generate the waypoints for the robot to follow in between without colliding.
+    The waypoints generate are equal distance from box1 and box2.
+    """
     def __init__(self, name, writer, reader):
         super(MapBounds, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

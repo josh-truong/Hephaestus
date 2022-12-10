@@ -11,6 +11,10 @@ from .models import MappingModel
 from .models import DisplayOverlays
 
 class Mapping(py_trees.behaviour.Behaviour):
+    """
+    Mapping using lidar, disable lidar if robot is turning in order to reduce stray noise from overlapping.
+    Uses homogenous transformation matrix form to speed up calculation
+    """
     def __init__(self, name, writer, reader):
         super(Mapping, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

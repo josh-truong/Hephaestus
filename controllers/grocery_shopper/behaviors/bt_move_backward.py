@@ -3,6 +3,7 @@ from .models import SpeedController
 import numpy as np
 
 class MoveBackward(py_trees.behaviour.Behaviour):
+    """Moves backward until a distance has been reached"""
     def __init__(self, name, writer, reader):
         super(MoveBackward, self).__init__(name)
         self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

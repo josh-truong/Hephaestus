@@ -10,6 +10,9 @@ import numpy as np
 from .models import SpeedController
 
 class Reverse(py_trees.behaviour.Behaviour):
+    """
+    Reverse until distance reached
+    """
     def __init__(self, name, writer, reader):
         super(Reverse, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

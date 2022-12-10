@@ -3,6 +3,9 @@ from .models import SpeedController
 import numpy as np
 
 class MoveForward(py_trees.behaviour.Behaviour):
+    """
+    Move forward until a distance has been reached
+    """
     def __init__(self, name, writer, reader):
         super(MoveForward, self).__init__(name)
         self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))

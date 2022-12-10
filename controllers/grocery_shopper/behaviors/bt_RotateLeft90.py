@@ -5,6 +5,9 @@ import numpy as np
 import math
 
 class RotateLeft90(py_trees.behaviour.Behaviour):
+    """
+    Rotate to 90 degrees to left
+    """
     def __init__(self, name, writer, reader):
         super(RotateLeft90, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
