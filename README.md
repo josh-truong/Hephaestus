@@ -3,6 +3,7 @@ Team Hephaestus final group project for CSCI 3302 - Intro to Robotics course.
 
 ## Running this controller:
 * Install all required packages: ikpy, pytrees, numpy, and pyploy
+* Add two side cameras on the robot
 * 
 
 ## File Structure
