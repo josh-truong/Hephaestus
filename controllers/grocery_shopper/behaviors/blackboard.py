@@ -52,7 +52,7 @@ class Blackboard:
         # Setting variables
         py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = True
-        writer.env.behavior_state = 1
+        writer.env.behavior_state = 0
         # writer.controller_type = 'manual'     # Enables manual control over the robot
         writer.controller_type = 'autonomous'   # Enables autonomous control of the robot which will use the rrt generated waypoints
 
