@@ -7,7 +7,7 @@ Last updated on Fri Dec 9 2022
 
 import numpy as np
 from .utils import Pose
-from .localization import Localization
+from .Localization import Localization
 
 from scipy.signal import convolve2d
 
