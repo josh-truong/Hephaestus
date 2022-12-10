@@ -18,7 +18,7 @@ import numpy as np
 
 # k means parameters
 MAX_LOOP = 10
-DCOST_TH = 0.1
+DCOST_TH = 0.01
 
 class Clusters:
 
@@ -74,7 +74,6 @@ class KmeansClustering:
 
         pre_cost = float("inf")
         for loop in range(MAX_LOOP):
-            print("loop:", loop)
             cost = clusters.update_clusters()
             clusters.calc_centroid()
 

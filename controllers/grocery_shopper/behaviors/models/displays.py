@@ -21,6 +21,12 @@ class DisplayOverlays:
         x, y = np.clip(x, 0, display[0]-1), np.clip(y, 0, display[1]-1)
         return [int(x), int(y)]
 
+    def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
+        """Converts Display into World Coordinates"""
+        x = ((display[0]*0.5) - x) / (display[0]/world[0])
+        y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
+        return [x,-y]
+
     def update_depth_display(self, image, width):
         """Updates Depth Display to represent what the Steroscopic Camera sees"""
         # Convert greyscale image to color
@@ -78,18 +84,19 @@ class DisplayOverlays:
             display.drawPixel(x, y)
         self.w.env.map = map
 
-    def draw_estimated_location_on_map(self):
+    def draw_estimated_location_on_map(self, object_location=None, color=0xFFFF00):
         """
         Represented in yellow boxes the estimated location of the objects in 
         interest in display/world coordinates
         """
         display = self.r.device.display
-        object_location = np.array(self.r.env.object_location)
+        if (object_location is None):
+            object_location = np.array(self.r.env.object_location)
 
-        display.setColor(0xFFFF00)
+        display.setColor(color)
         for x,y,_ in object_location:
             x, y = self.get_display_coords(x, y)
-            display.drawRectangle(x-5, y-5, 10,10)
+            display.fillOval(x, y, 5, 5)
     
     def redraw_display(self, map):
         """Redraw current map"""

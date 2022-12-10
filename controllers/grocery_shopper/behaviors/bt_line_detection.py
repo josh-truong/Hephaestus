@@ -51,7 +51,7 @@ class LineDetection(py_trees.behaviour.Behaviour):
         for x1,y1,x2,y2 in lines:
             cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),5)
         self.Display.redraw_display(line_image/255)
-        self.w.env.map.map = line_image
+        self.w.env.map.map = line_image/255
         return py_trees.common.Status.SUCCESS
         
     def terminate(self, new_status):

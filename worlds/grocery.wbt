@@ -14,14 +14,13 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/project
 EXTERNPROTO "../protos/BiscuitBox.proto"
 EXTERNPROTO "../protos/Can.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Parquetry.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/460e745f54975d0052b556f065d410b386d3b8c1/projects/bounding_objects/protos/PipeBoundingObject.proto"
 EXTERNPROTO "../protos/MultiSenseS21.proto"
 
 WorldInfo {
 }
 Viewpoint {
   orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position -8.459552579697599 0.029523681527228975 96.13093569753474
+  position -10.349850567975988 0.7094097782555757 73.67336456405499
   follow "floor"
 }
 TexturedBackground {
@@ -46,98 +45,6 @@ Wall {
   translation -15 1.30053e-07 3.5
   rotation -0.5773502691890485 -0.5773512691895147 -0.5773492691885823 -2.094395307179586
   size 16.1 7 0.5
-}
-Solid {
-  translation 10.8886 -3.96874 2.08
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon2"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
-  translation 14.5286 0.26126 3.14
-  rotation 1 0 0 -1.5707953071795862
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon1"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
-  translation -3.3114 7.32126 2.08
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon3"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
-  translation -3.3114 -7.26874 2.08
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon4"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
-  translation -3.3114 -0.10874 2.08
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon5"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
-  translation 10.7586 4.00126 2.08
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon6"
-  recognitionColors [
-    0 1 0
-  ]
-}
-Solid {
-  translation -13.7914 0.05126 1.45
-  children [
-    PipeBoundingObject {
-      height 1
-      radius 0.25
-    }
-  ]
-  name "beacon7"
-  recognitionColors [
-    0 1 0
-  ]
 }
 Wall {
   translation 14.5 3.77932e-06 3.5
@@ -1180,7 +1087,6 @@ TiagoSteel {
       rotation 1 0 0 -1.57
       cameraWidth 240
       cameraHeight 135
-      rangeFinderMaxRange 5
       metaCamera TRUE
       metaRangeFinder TRUE
     }
@@ -8868,7 +8774,7 @@ Solid {
   ]
 }
 Solid {
-  translation 11.54700089236079 -8.505688705029803 0.03486540680000002
+  translation 11.5367 -7.23569 0.0848654
   rotation 1.50089514124105e-14 3.2500989424856702e-15 1 0.006377906779438983
   children [
     Shape {

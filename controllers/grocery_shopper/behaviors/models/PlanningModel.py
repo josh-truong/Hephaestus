@@ -182,7 +182,7 @@ class Planning:
         y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
         return [x,-y]
 
-    def getWaypoints(self, nodes, display_coords=False):
+    def getWaypoints(self, nodes, display_coords=False, smooth=True):
         # list of waypoints in map coords, tulpes with (x, y, theta)
         waypoints = []
         goal_node = nodes[-1]
@@ -195,14 +195,18 @@ class Planning:
                 else:
                     waypoints.reverse()
                     try:
-                        waypoints = self.smooth_path(waypoints)[:-1]
-                        new_waypoints = []
-                        for i in range(len(waypoints)-1):
-                            start, end = waypoints[i], waypoints[i+1]
-                            num_pixels_between = abs(start[0]-end[0])+abs(start[1]-end[1])
-                            new_waypoints.extend(np.linspace(start, end, int(num_pixels_between)))
-                        waypoints = [self.get_world_coords(x, y) for x,y in new_waypoints]
-                        return waypoints
+                        if (smooth):
+                            waypoints = self.smooth_path(waypoints)[:-1]
+                            new_waypoints = []
+                            for i in range(len(waypoints)-1):
+                                start, end = waypoints[i], waypoints[i+1]
+                                num_pixels_between = abs(start[0]-end[0])+abs(start[1]-end[1])
+                                new_waypoints.extend(np.linspace(start, end, int(num_pixels_between)))
+                            waypoints = [self.get_world_coords(x, y) for x,y in new_waypoints]
+                            return waypoints
+                        else:
+                            waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
+                            return waypoints
                     except:
                         waypoints = [self.get_world_coords(x, y) for x,y in waypoints]
                         return waypoints

@@ -12,12 +12,16 @@ from behaviors import Blackboard
 from behaviors import Controller
 from behaviors import Mapping
 from behaviors import DenoiseMap
+from behaviors import LocationFilter
 from behaviors import LineDetection
 from behaviors import MapBounds
 from behaviors import CameraVision
 from behaviors import ObstacleAvoidance
 from behaviors import Planning
 from behaviors import RRT
+from behaviors import RRTObject
+from behaviors import KMeans
+from behaviors import LockAndLoad
 
 blackboard = Blackboard()
 writer, reader = blackboard.get()
@@ -84,16 +88,21 @@ The width of the lines will hopefully merge with other nearby lines.
 path_planning = py_trees.composites.Sequence("Sequence")
 path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
 path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
+path_planning.add_child(LocationFilter(name="Filtering Object Location", writer=writer, reader=reader))
+path_planning.add_child(KMeans(name="K-means Clustering", writer=writer, reader=reader))
 path_planning.setup_with_descendants()
 
 
 block_collection = py_trees.composites.Sequence("Sequence")
+block_collection.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
+block_collection.add_child(RRTObject(name="RRT To Object", writer=writer, reader=reader))
+block_collection.add_child(LockAndLoad(name="LockAndLoad", writer=writer, reader=reader))
 block_collection.setup_with_descendants()
 
 
 counter = 0
 # Main Loop
-writer.env.behavior_state = 1
+# writer.env.behavior_state = 1
 while robot.step(int(robot.getBasicTimeStep())) != -1:
     if (reader.env.behavior_state == 0):
         if (reader.env.num_completed_paths == reader.env.max_completed_paths): writer.env.behavior_state = 1
@@ -101,18 +110,12 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
     elif (reader.env.behavior_state == 1):
         path_planning.tick_once()
         writer.env.behavior_state = 2
+        writer.env.rerun_rrt = True
+    elif (reader.env.behavior_state == 2):
+        if (counter%100==0):
+            DisplayOverlays(writer, reader).draw_estimated_location_on_map(reader.env.kmeans_location, color=0x00FF00)
+        block_collection.tick_once()
 
-        # waypoints = []
-        # for waypoint in reader.env.waypoints:
-        #     wx, wy = DisplayOverlays(writer, reader).get_display_coords(waypoint[0],waypoint[1])
-        #     waypoints.append([wx, wy])
-        
-        # waypoints = np.array(waypoints)
-        # plt.imshow(reader.env.map.map)
-        # plt.scatter(waypoints[:,0],waypoints[:,1], color='green', s=0.5)
-        # plt.show()
-    else:
-        pass
 
     # counter += 1
     # if (counter%3000 == 0):
