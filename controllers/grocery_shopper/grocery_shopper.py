@@ -101,16 +101,6 @@ block_collection = py_trees.composites.Sequence("Sequence")
 block_collection.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
 block_collection.add_child(LockAndLoad(name="LockAndLoad", writer=writer, reader=reader))
 block_collection.setup_with_descendants()
-writer.env.waypoints = [
-            [5.210931040630611, -2.210988145012728],
-            [-13.192591374679662, -2.22138003370971],
-            [-13.154953213728083,  -5.756066295328318],
-            [5.501602885777003,  -5.553924695245729],
-            [5.423878744330168, 2.263936779778975],
-            [-12.65776213906247, 2.0846689769211477],
-            [-12.708079837301646, 5.7219656125502905],
-            [5.387549771991973, 5.9776086031667655]]
-writer.env.state = 0
 
 
 counter = 0
@@ -131,6 +121,7 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
         pass
 
 
+    # Save robot progress
     counter += 1
     if (counter%2000 == 0):
         np.save("assets/map.npy", reader.env.map.map)
