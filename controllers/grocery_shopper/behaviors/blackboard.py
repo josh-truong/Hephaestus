@@ -46,11 +46,11 @@ class Blackboard:
             reader.register_key(key=key, access=py_trees.common.Access.READ)
 
         # Setting variables
-        # py_trees.logging.level = py_trees.logging.Level.DEBUG
+        py_trees.logging.level = py_trees.logging.Level.DEBUG
         writer.debug = False
         writer.env.behavior_state = 1
-        # writer.controller_type = 'manual'
-        writer.controller_type = 'autonomous'
+        writer.controller_type = 'manual'
+        # writer.controller_type = 'autonomous'
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
@@ -79,7 +79,7 @@ class Blackboard:
         writer.env.waypoints = None
         writer.env.vaiable_waypoints = []
         # writer.env.vaiable_waypoints = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\viable_waypoints.npy').tolist()
-        writer.env.kmeans_state = 0
+        writer.env.kmeans_state = 1
         writer.env.kmeans_location = []
         writer.env.object_location = []
         writer.env.object_location = np.load('assets/object_location.npy').tolist()
