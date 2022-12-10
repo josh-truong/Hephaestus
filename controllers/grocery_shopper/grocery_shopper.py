@@ -92,7 +92,11 @@ path_planning = py_trees.composites.Sequence("Sequence")
 # path_planning.add_child(KMeans(name="K-means Clustering", writer=writer, reader=reader))
 path_planning.setup_with_descendants()
 
-
+"""
+block_collection should have run to collect the blocks
+Robot would move up and down each aisle, stopping when seeing a block to turn and collect it
+While we had all of the code developed seprately, we couldn't put it all together in time to successfully collect any blocks
+"""
 block_collection = py_trees.composites.Sequence("Sequence")
 block_collection.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
 block_collection.add_child(LockAndLoad(name="LockAndLoad", writer=writer, reader=reader))

@@ -14,6 +14,8 @@ from ikpy.chain import Chain
 """
 Used the following github instructions to learn the basics of the ikpy library
 https://gist.github.com/ItsMichal/4a8fcb330d04f2ccba582286344dd9a7
+
+This class is for handling the manipulation of the robot arm
 """
 
 class Manipulation:
@@ -56,10 +58,12 @@ class Manipulation:
                 position_sensor.enable(timeStep)
                 self.motors.append(motor)
 
+    # get the positions of the motors
     def getInitialPosition(self):
         initial_position = [0,0,0,0] + [m.getPositionSensor().getValue() for m in self.motors] + [0,0,0,0]
         return initial_position
 
+    # apply the results of the inverse kinematics calculations
     def applyIKResults(self, results):
         for res in range(len(results)):
             # ignore motors that can't be controlled
@@ -67,33 +71,36 @@ class Manipulation:
                 self.supervisor.getDevice(self.chain.links[res].name).setPosition(results[res])
                 print("Setting {} to {}".format(self.chain.links[res].name, results[res]))
 
+    # moves arm above the box
     def moveArmToBox(self):
         target = [0.30,0,0.70]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
 
+    # move the arm above to head to get it out of the way
     def setDrivingState(self):
         target = [0,0,7]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
 
+    # opens the gripper
     def openGripper(self):
         self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.045)
         self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.045)
                 
-
+    # closes the gripper
     def closeGripper(self):
         self.supervisor.getDevice("gripper_right_finger_joint").setPosition(0.0275)
         self.supervisor.getDevice("gripper_left_finger_joint").setPosition(0.0275)
 
+    # moves the grabbber around the cube
     def grabCube(self):
         target = [1.0,0.075,1.10]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
 
+    # moves the grabber right above the cube
     def moveArmToCube(self):
-        # need to get cube position
         target = [1.0,0.075,1.25]
         ikResults = self.chain.inverse_kinematics(target, initial_position=self.getInitialPosition(),  target_orientation = [0,0,1], orientation_mode="Y")
         self.applyIKResults(ikResults)
-        # self.grabCube(target)

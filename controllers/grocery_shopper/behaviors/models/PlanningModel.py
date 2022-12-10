@@ -14,7 +14,7 @@ from scipy import interpolate
 
 class Node:
     """
-    Node for RRT Algorithm. This is what you'll make your graph with!
+    Node for RRT Algorithm
     """
     def __init__(self, pt, parent=None):
         self.point = pt # n-Dimensional point
@@ -28,8 +28,7 @@ class Planning:
     def visualize_2D_graph(self, map, nodes, goal_point=None, filename=None):
         '''
         Function to visualise the 2D world, the RRT graph, path to goal if goal exists
-        :param state_bounds: Array of min/max for each dimension
-        :param obstacles: Locations and radii of spheroid obstacles
+        :param map: the map of the environment
         :param nodes: List of vertex locations
         :param goal_point: Point within state_bounds to target with the RRT. (OPTIONAL, can be None)
         :param filename: Complete path to the file on which this plot will be saved
@@ -44,7 +43,7 @@ class Planning:
             if node.parent is not None:
                 node_path = np.array(node.path_from_parent)
                 plt.plot(node_path[:,0], node_path[:,1], '-b')
-            # The goal may not be on the RRT so we are finding the point that is a 'proxy' for the goal
+            # The goal may not be on the RRT so we are finding the point that is a stand-in for the goal
             if goal_point is not None and np.linalg.norm(node.point - np.array(goal_point)) <= 1e-5:
                 goal_node = node
                 plt.plot(node.point[0], node.point[1], 'k^')
@@ -79,10 +78,9 @@ class Planning:
         '''
         Function that finds a node in node_list with closest node.point to query q_point
         :param node_list: List of Node objects
-        :param q_point: n-dimensional array representing a point
+        :param q_point: 2-dimensional array representing a point
         :return Node in node_list with closest node.point to query q_point
         '''
-        # TODO: Your Code Here
         minDist = np.linalg.norm(node_list[0].point - q_point) # stores the minimum distance between q-point and minNode.point 
         minNode = node_list[0] # the closest node to q_point
         for i in range(1,len(node_list)):
@@ -101,12 +99,11 @@ class Planning:
             
     def steer(self, from_point, to_point, delta_q):
         '''
-        :param from_point: n-Dimensional array (point) where the path to "to_point" is originating from (e.g., [1.,2.])
-        :param to_point: n-Dimensional array (point) indicating destination (e.g., [0., 0.])
-        :param delta_q: Max path-length to cover, possibly resulting in changes to "to_point" (e.g., 0.2)
-        :return path: Array of points leading from "from_point" to "to_point" (inclusive of endpoints)  (e.g., [ [1.,2.], [1., 1.], [0., 0.] ])
+        :param from_point: 2-Dimensional array (point) where the path to "to_point" is originating from 
+        :param to_point: 2-Dimensional array (point) indicating destination 
+        :param delta_q: Max path-length to cover, possibly resulting in changes to "to_point" 
+        :return path: Array of points leading from "from_point" to "to_point" (inclusive of endpoints)
         '''
-        # TODO: Figure out if you can use "to_point" as-is, or if you need to move it so that it's only delta_q distance away
         if np.linalg.norm(from_point - to_point) > delta_q: # gets the distance between the two points and sees if it is greater than delta_q
             # if greater than delta_q normalize vector pointing from from_point to to_point, make it the length of delta_q, 
             # and add it to from_point to get the new to_point
@@ -115,18 +112,16 @@ class Planning:
             change_vector = unit_vector * (delta_q - (delta_q / 100000)) # subtracting small amount from delta_q because sometimes the unit vector is normalized to something slightly bigger than 1
             to_point = from_point + change_vector
             to_point = np.floor(to_point)
-        # TODO Use the np.linspace function to get 10 points along the path from "from_point" to "to_point"
         path = np.floor(np.linspace(from_point, to_point, 10))
         return path
 
     def check_path_valid(self, path, map):
         '''
-        Function that checks if a path (or edge that is made up of waypoints) is collision free or not
-        :param path: A 1D array containing a few (10 in our case) n-dimensional points along an edge
-        :param state_is_valid: Function that takes an n-dimensional point and checks if it is valid
+        Function that checks if a path is colliding with any obstacles
+        :param path: A 1D array containing 2-dimensional points
+        :param map: the map to check against
         :return: Boolean based on whether the path is collision free or not
         '''
-        # TODO: Your Code Here
         valid = True
         for point in path:
             valid = valid and self.state_is_valid(point, map) # checks each point in the path, valid will become false if any of them are not valid points
@@ -134,14 +129,6 @@ class Planning:
 
     def rrt(self, starting_point, goal_point, k, delta_q, map):
         '''
-        TODO: Implement the RRT algorithm here, making use of the provided state_is_valid function.
-        RRT algorithm.
-        If goal_point is set, your implementation should return once a path to the goal has been found 
-        (e.g., if q_new.point is within 1e-5 distance of goal_point), using k as an upper-bound for iterations. 
-        If goal_point is None, it should build a graph without a goal and terminate after k iterations.
-
-        :param state_bounds: matrix of min/max values for each dimension (e.g., [[0,1],[0,1]] for a 2D 1m by 1m square)
-        :param state_is_valid: function that maps states (N-dimensional Real vectors) to a Boolean (indicating free vs. forbidden space)
         :param starting_point: Point within state_bounds to grow the RRT from
         :param goal_point: Point within state_bounds to target with the RRT. (OPTIONAL, can be None)
         :param k: Number of points to sample
@@ -151,8 +138,6 @@ class Planning:
         
         node_list = []
         node_list.append(Node(starting_point, parent=None)) # Add Node at starting point with no parent
-        # TODO: Your code here
-        # TODO: Make sure to add every node you create onto node_list, and to set node.parent and node.path_from_parent for each
         for i in range(k):
             # create a random new point, setting it to the goal_point a small portion of the time
             rand = np.array([])
@@ -177,6 +162,7 @@ class Planning:
         return node_list
 
 
+    # get world coords from display coords
     def get_world_coords(self, x, y, display=(360, 360), world=(30, 15)):
         x = ((display[0]*0.5) - x) / (display[0]/world[0])
         y = (y + (display[1]*0.5) - display[1]) / (display[1]/world[1])
@@ -228,15 +214,3 @@ class Planning:
         #create interpolated lists of points
         xn, yn = interpolate.splev(np.linspace(0, 1, 20), tck)
         return list(zip(xn, yn))
-
-
-# if __name__ == "__main__":
-#     planner = Planning()
-#     K = 1000 # Feel free to adjust as desired
-#     map = np.load("../../assets/filter_map.npy")
-
-#     starting_point = [20,200]
-#     goal = np.array([325, 325])
-#     nodes = planner.rrt(starting_point, goal, K, 10, map)
-#     planner.getWaypoints(nodes)
-#     # planner.visualize_2D_graph(map, nodes, goal, 'rrt_run2.png')
