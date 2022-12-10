@@ -30,6 +30,7 @@ class Blackboard:
             "device/gps", "device/compass", 
             "device/lidar", "device/disable_lidar", 
             "device/meta_camera", "device/range_finder", 
+            "device/left_camera", "device/right_camera",
             "device/display", "device/depth_display", 
             "env/map", "env/refresh_hz", "env/ftol", "env/waypoints", "env/state", 
             "env/goal", "env/rerun_rrt", "env/state_step",
@@ -47,10 +48,10 @@ class Blackboard:
 
         # Setting variables
         py_trees.logging.level = py_trees.logging.Level.DEBUG
-        writer.debug = False
-        writer.env.behavior_state = 1
-        writer.controller_type = 'manual'
-        # writer.controller_type = 'autonomous'
+        writer.debug = True
+        writer.env.behavior_state = 0
+        # writer.controller_type = 'manual'
+        writer.controller_type = 'autonomous'
 
         writer.constants.robot = RobotConstants()
         writer.constants.lidar = LidarConstants()
@@ -64,7 +65,7 @@ class Blackboard:
         writer.robot.msg = ""
 
         writer.env.map = Map()
-        writer.env.map.map = np.load('assets/map.npy')
+        # writer.env.map.map = np.load('assets/map.npy')
         writer.env.xmax_boundary = 360
         writer.env.ymax_boundary = 360
         writer.env.num_objects = 12
@@ -74,7 +75,8 @@ class Blackboard:
         writer.env.refresh_hz = 50
         writer.env.ftol = 1
         writer.env.state = 0
-        writer.env.state_step = 15
+        # writer.env.state_step = 15
+        writer.env.state_step = 1
         writer.env.goal = None
         writer.env.waypoints = None
         writer.env.vaiable_waypoints = []
@@ -82,7 +84,7 @@ class Blackboard:
         writer.env.kmeans_state = 1
         writer.env.kmeans_location = []
         writer.env.object_location = []
-        writer.env.object_location = np.load('assets/object_location.npy').tolist()
+        # writer.env.object_location = np.load('assets/object_location.npy').tolist()
 
         writer.ik.rtol = 0.2
         writer.ik.atol = 3.14/10
@@ -112,6 +114,8 @@ class Blackboard:
         writer.device.lidar = device.lidar
         writer.device.display = device.display
         writer.device.depth_display = device.depth_display
+        writer.device.left_camera = device.left_camera
+        writer.device.right_camera = device.right_camera
         writer.device.meta_camera = device.meta_camera
         writer.device.range_finder = device.range_finder
         writer.device.keyboard = device.keyboard

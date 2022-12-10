@@ -9,6 +9,7 @@ import py_trees
 from .models import ObjectBound
 from .models import DisplayOverlays
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class MapBounds(py_trees.behaviour.Behaviour):
@@ -36,6 +37,8 @@ class MapBounds(py_trees.behaviour.Behaviour):
         bounds = self.boundMap.return_bounds(blobs)
         self.Displays.draw_obstacle_bounds(self.w.device.display, bounds, 0xFF0000)
         self.Displays.draw_viable_waypoints()
+        plt.imshow(self.r.env.map.map)
+        plt.show()
         return py_trees.common.Status.SUCCESS
         
     def terminate(self, new_status):

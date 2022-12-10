@@ -2,10 +2,11 @@ import py_trees
 from .models import Vision
 from .models import SpeedController
 import numpy as np
+import math
 
-class AlignToObject(py_trees.behaviour.Behaviour):
+class RotateLeft90(py_trees.behaviour.Behaviour):
     def __init__(self, name, writer, reader):
-        super(AlignToObject, self).__init__(name)
+        super(RotateLeft90, self).__init__(name)
         # self.logger.debug("%s [%s::__init__()]" % (self.name, self.__class__.__name__))
         self.w, self.r = writer, reader
 
@@ -20,20 +21,18 @@ class AlignToObject(py_trees.behaviour.Behaviour):
         self.controller = SpeedController(self.w, self.r)
 
     def initialise(self):
-        centroids, blobs, img_mask = self.vision.detect(self.camera.getImageArray(), toggleShow=False)
-        if (centroids is None or centroids == []): return py_trees.common.Status.SUCCESS
-        idx = np.argmax([len(blob) for blob in blobs])
-        x = centroids[idx][0]
-        speed = self.r.constants.robot.MAX_SPEED
-        margin = 10
-        # if (x - ((240//2) + margin) < 0):
-        #     vL, vR = speed*0.2, -speed*0.2
-        # elif ():
-        #     vL, vR = -speed*0.2, speed*0.2
-        # self.w.robot.vL, self.w.robot.vR = vL, vR
-        # self.controller.set_wheel_joint_vel(vL, vR)
-        # self.controller.localization.update_odometry()
-        pass
+        robot = self.r.robot.robot
+        while (robot.step(int(robot.getBasicTimeStep())) != -1):
+            compass = self.r.device.compass.getValues()
+            degrees = np.degrees(math.atan2(compass[0], compass[1]))
+            if (88 <= degrees and degrees <= 92):
+                break
+            speed = self.r.constants.robot.MAX_SPEED
+            vL, vR = -1.05, 1.05
+            self.w.robot.vL, self.w.robot.vR = vL, vR
+            self.controller.set_wheel_joint_vel(vL, vR)
+            self.controller.localization.update_odometry()
+        return py_trees.common.Status.SUCCESS
 
     def update(self):
         self.feedback_message = ""

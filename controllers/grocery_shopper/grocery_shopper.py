@@ -19,7 +19,6 @@ from behaviors import CameraVision
 from behaviors import ObstacleAvoidance
 from behaviors import Planning
 from behaviors import RRT
-from behaviors import RRTObject
 from behaviors import KMeans
 from behaviors import LockAndLoad
 
@@ -70,8 +69,9 @@ autonomous_mapping.add_child(ObstacleAvoidance(name="Avoiding Obstacle", writer=
 autonomous_mapping.add_child(RRT(name="RRT", writer=writer, reader=reader))
 autonomous_mapping.add_child(Mapping(name="Mapping Controller", writer=writer, reader=reader))
 autonomous_mapping.add_child(DenoiseMap(name="Denoising Map", writer=writer, reader=reader))
-autonomous_mapping.add_child(CameraVision(name="Detecting Cube", writer=writer, reader=reader))
+# autonomous_mapping.add_child(CameraVision(name="Detecting Cube", writer=writer, reader=reader))
 autonomous_mapping.setup_with_descendants()
+
 
 """
 path_planning sequence will run only once.
@@ -86,18 +86,27 @@ The width of the lines will hopefully merge with other nearby lines.
     vision assist in picking the blocks
 """
 path_planning = py_trees.composites.Sequence("Sequence")
-path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
-path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
+# path_planning.add_child(LineDetection(name="Line Detection", writer=writer, reader=reader))
+# path_planning.add_child(MapBounds(name="Obstacle Boundings", writer=writer, reader=reader))
 # path_planning.add_child(LocationFilter(name="Filtering Object Location", writer=writer, reader=reader))
-path_planning.add_child(KMeans(name="K-means Clustering", writer=writer, reader=reader))
+# path_planning.add_child(KMeans(name="K-means Clustering", writer=writer, reader=reader))
 path_planning.setup_with_descendants()
 
 
 block_collection = py_trees.composites.Sequence("Sequence")
 block_collection.add_child(Controller(name="Controlling Robot", writer=writer, reader=reader))
-block_collection.add_child(RRTObject(name="RRT To Object", writer=writer, reader=reader))
 block_collection.add_child(LockAndLoad(name="LockAndLoad", writer=writer, reader=reader))
 block_collection.setup_with_descendants()
+writer.env.waypoints = [
+            [5.210931040630611, -2.210988145012728],
+            [-13.192591374679662, -2.22138003370971],
+            [-13.154953213728083,  -5.756066295328318],
+            [5.501602885777003,  -5.553924695245729],
+            [5.423878744330168, 2.263936779778975],
+            [-12.65776213906247, 2.0846689769211477],
+            [-12.708079837301646, 5.7219656125502905],
+            [5.387549771991973, 5.9776086031667655]]
+writer.env.state = 0
 
 
 counter = 0
@@ -112,14 +121,15 @@ while robot.step(int(robot.getBasicTimeStep())) != -1:
         writer.env.behavior_state = 2
         writer.env.rerun_rrt = True
     elif (reader.env.behavior_state == 2):
-        if (counter%100==0):
-            DisplayOverlays(writer, reader).draw_estimated_location_on_map(reader.env.kmeans_location, color=0x00FF00)
+        # if (counter%100==0):
+        #     DisplayOverlays(writer, reader).draw_estimated_location_on_map(reader.env.kmeans_location, color=0x00FF00)
         block_collection.tick_once()
+        pass
 
 
-    # counter += 1
-    # if (counter%3000 == 0):
-    #     np.save("assets/map.npy", reader.env.map.map)
-    #     np.save("assets/viable_waypoints.npy", reader.env.vaiable_waypoints)
-    #     np.save("assets/object_location.npy", reader.env.object_location)
-    #     writer.robot.msg = "Map, waypoints, est. cube location saved!"
+    counter += 1
+    if (counter%2000 == 0):
+        np.save("assets/map.npy", reader.env.map.map)
+        np.save("assets/viable_waypoints.npy", reader.env.vaiable_waypoints)
+        np.save("assets/object_location.npy", reader.env.object_location)
+        writer.robot.msg = "Map, waypoints, est. cube location saved!"

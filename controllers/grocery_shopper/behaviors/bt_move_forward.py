@@ -20,14 +20,29 @@ class MoveForward(py_trees.behaviour.Behaviour):
         pass
 
     def update(self):
-        self.feedback_message = ""
-        self.log_message("update()", self.feedback_message)
+        self.log_message("update()", "Moving Forward")
 
-        speed = self.r.constants.robot.MAX_SPEED
-        vL, vR = speed*0.2, speed*0.2
-        self.w.robot.vL, self.w.robot.vR = vL, vR
-        self.controller.set_wheel_joint_vel(vL, vR)
-        self.controller.localization.update_odometry()
+        def get_lidar_readings():
+            lidar = self.r.device.lidar
+            lidar_sensor_readings = lidar.getRangeImage()
+            lidar_sensor_readings = lidar_sensor_readings[83:len(lidar_sensor_readings)-83]
+            return lidar_sensor_readings
+
+        robot = self.r.robot.robot
+        while (robot.step(int(robot.getBasicTimeStep())) != -1):
+            # Get the 25th percentile of lidar readings
+            lidar_readings = np.array(get_lidar_readings())
+            lidar_idx = np.where(lidar_readings <= np.percentile(lidar_readings, 25))[0]
+            mean_depth = np.mean(lidar_readings[lidar_idx])
+
+            if (mean_depth > 1):
+                speed = self.r.constants.robot.MAX_SPEED
+                vL, vR = speed*0.2, speed*0.2
+                self.w.robot.vL, self.w.robot.vR = vL, vR
+                self.controller.set_wheel_joint_vel(vL, vR)
+                self.controller.localization.update_odometry()
+            else:
+                break
         return py_trees.common.Status.SUCCESS
 
     def terminate(self, new_status):

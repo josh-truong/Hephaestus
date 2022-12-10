@@ -11,7 +11,5 @@ from .bt_obstacle_avoidance import ObstacleAvoidance
 from .models import Planning
 from .bt_reverse import Reverse
 from .bt_rrt import RRT
-from .bt_rrt_to_object import RRTObject
 from .bt_lock_n_load import LockAndLoad
 from .bt_move_forward import MoveForward
-from .bt_align_to_object import AlignToObject
