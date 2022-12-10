@@ -64,7 +64,7 @@ class Blackboard:
         writer.robot.msg = ""
 
         writer.env.map = Map()
-        writer.env.map.map = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\map.npy')
+        writer.env.map.map = np.load('assets/map.npy')
         writer.env.xmax_boundary = 360
         writer.env.ymax_boundary = 360
         writer.env.num_objects = 12
@@ -82,7 +82,7 @@ class Blackboard:
         writer.env.kmeans_state = 0
         writer.env.kmeans_location = []
         writer.env.object_location = []
-        writer.env.object_location = np.load('C:\\Users\\joshk\\OneDrive\\Desktop\\CSCI 3302 - Intro to Robotics\\Hephaestus\\controllers\\grocery_shopper\\assets\\object_location.npy').tolist()
+        writer.env.object_location = np.load('assets/object_location.npy').tolist()
 
         writer.ik.rtol = 0.2
         writer.ik.atol = 3.14/10
