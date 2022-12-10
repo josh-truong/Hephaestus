@@ -32,9 +32,9 @@ while supervisor.step(timeStep) != -1:
             print(len(blob))
         diff = (120 - locations[0][1])
         if diff <= 0:
-            xTarget = (120 - locations[0][1]) * 0.009#0.009204136
+            xTarget = (120 - locations[0][1]) * 0.0088#0.009204136
         else:
-            xTarget = (120 - locations[0][1]) * 0.01#0.009204136
+            xTarget = (120 - locations[0][1]) * 0.0095#0.009204136
     if count == 0:
         manipulation.setDrivingState()
     if count == 20:
