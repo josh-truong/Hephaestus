@@ -8,11 +8,11 @@ orthographicViewHeight: 1
 textFiles: -1
 globalOptionalRendering: LidarPointClouds::CoordinateSystem
 consoles: Console:All:All
-renderingDevicePerspectives: TIAGo Steel:MultiSense S21 left camera;0;1;0.167878;0.192394
+renderingDevicePerspectives: TIAGo Steel:MultiSense S21 left camera;0;1;0.178107;0.42971
 renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta camera;1;1.6963;0;0
-renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta range finder;0;1;0.231831;0.225951
-renderingDevicePerspectives: TIAGo Steel:MultiSense S21 right camera;0;1;0.148256;0.255034
-renderingDevicePerspectives: TIAGo Steel:depth display;0;1;0.0893895;0.328859
-renderingDevicePerspectives: TIAGo Steel:display;1;1.43611;0.28219;0.0760794
-renderingDevicePerspectives: TIAGo Steel:left camera;0;1.21481;0;0
-renderingDevicePerspectives: TIAGo Steel:right camera;0;1.20833;0.099689;0
+renderingDevicePerspectives: TIAGo Steel:MultiSense S21 meta range finder;0;1;0.0471138;0.64821
+renderingDevicePerspectives: TIAGo Steel:MultiSense S21 right camera;0;1;0.134417;0.523446
+renderingDevicePerspectives: TIAGo Steel:depth display;0;1;0;0.536715
+renderingDevicePerspectives: TIAGo Steel:display;1;1.43611;0;0.148937
+renderingDevicePerspectives: TIAGo Steel:left camera;0;1.21481;0;0.391162
+renderingDevicePerspectives: TIAGo Steel:right camera;0;1.20833;0.0371138;0.522096
